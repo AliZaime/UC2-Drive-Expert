@@ -43,6 +43,54 @@ _Concept: Trust, Clarity, Deal-Focus._
 - **Smart Actions**: Buttons "Accept", "Counter", "Decline" to avoid typing.
 - **Deal Probability**: Progress bar at the top to gamify the experience.
 
+### 4. AI Car Valuation (The Tech Feature)
+
+_Concept: Futuristic scanning, Data-driven, Trustworthy._
+
+![AI Valuation](./img/ai_valuation.png)
+
+**Key Elements:**
+
+- **Split View**: Visual Scanning (Left) vs Financial Data (Right).
+- **Overlays**: Green bounding boxes showing "detected scratches" to prove AI intelligence.
+- **Result**: "Final Offer" in large bold white font.
+
+### 5. Contract Signing (The Legal Step)
+
+_Concept: Secure, Professional, binding._
+
+![Contract Signing](./img/contract_signing.png)
+
+**Key Elements:**
+
+- **Document Viewer**: Realistic PDF render in center.
+- **Signature Pad**: Bottom drawer for e-signature.
+- **Trust Indicators**: "Legal Stamp" icon and "Secure Connection" badge.
+
+### 6. Agency Locator (The Go-To-Market)
+
+_Concept: Navigational, Dark Map, Neon Pins._
+
+![Geo Map](./img/geo_map.png)
+
+**Key Elements:**
+
+- **Map Style**: Dark Mode (Mapbox/Google Maps Night).
+- **Floating Card**: Details of the selected agency overlaid on top.
+- **Neon Pins**: Easy to spot locations.
+
+### 7. Login Screen (The First Impression)
+
+_Concept: Cinematic, Luxury, Minimalist form._
+
+![Login](./img/login.png)
+
+**Key Elements:**
+
+- **Imagery**: High-end car detail (Taillight) on the right.
+- **Form**: Clean input fields on left.
+- **Social Login**: "Login with Google" option.
+
 ---
 
 ## 🎨 Design Tokens
