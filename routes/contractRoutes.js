@@ -44,6 +44,24 @@ router.post('/generate', contractController.generateContract);
  */
 router.post('/:id/sign', contractController.signContract);
 
+/**
+ * @swagger
+ * /contracts/{id}:
+ *   get:
+ *     summary: Get contract details
+ *     tags: [Contracts]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Contract details
+ *       404:
+ *         description: Contract not found
+ */
 router.get('/:id', contractController.getContract);
 
 module.exports = router;

@@ -10,7 +10,28 @@ const router = express.Router();
 router.use(authMiddleware.protect);
 
 // Dashboard
+/**
+ * @swagger
+ * /dashboard/overview:
+ *   get:
+ *     summary: Get dashboard overview
+ *     tags: [Commercial]
+ *     responses:
+ *       200:
+ *         description: Dashboard overview data
+ */
 router.get('/dashboard/overview', dashboardController.getOverview);
+
+/**
+ * @swagger
+ * /dashboard/kpis:
+ *   get:
+ *     summary: Get KPIs metrics
+ *     tags: [Commercial]
+ *     responses:
+ *       200:
+ *         description: KPIs data
+ */
 router.get('/dashboard/kpis', dashboardController.getKPIs);
 
 /**
@@ -60,12 +81,109 @@ router.route('/vehicles')
     .get(vehicleController.getAllVehicles)
     .post(vehicleController.createVehicle);
 
+/**
+ * @swagger
+ * /vehicles/{id}:
+ *   get:
+ *     summary: Get vehicle by ID
+ *     tags: [Commercial]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Vehicle details
+ *       404:
+ *         description: Vehicle not found
+ *   put:
+ *     summary: Update vehicle
+ *     tags: [Commercial]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Vehicle updated
+ *       404:
+ *         description: Vehicle not found
+ *   delete:
+ *     summary: Delete vehicle
+ *     tags: [Commercial]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Vehicle deleted
+ *       404:
+ *         description: Vehicle not found
+ */
 router.route('/vehicles/:id')
     .get(vehicleController.getVehicle)
     .put(vehicleController.updateVehicle)
     .delete(vehicleController.deleteVehicle);
-    
+
+/**
+ * @swagger
+ * /vehicles/{id}/photos:
+ *   post:
+ *     summary: Upload vehicle photos
+ *     tags: [Commercial]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               photos:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *     responses:
+ *       200:
+ *         description: Photos uploaded successfully
+ */
 router.post('/vehicles/:id/photos', vehicleController.uploadPhotosMiddleware, vehicleController.uploadVehiclePhotos);
+
+/**
+ * @swagger
+ * /vehicles/{id}/valuation:
+ *   get:
+ *     summary: Get vehicle valuation
+ *     tags: [Commercial]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Vehicle valuation data
+ */
 router.get('/vehicles/:id/valuation', vehicleController.valueVehicle);
 
 /**
@@ -95,10 +213,73 @@ router.route('/clients')
     .get(clientController.getAllClients)
     .post(clientController.createClient);
 
+/**
+ * @swagger
+ * /clients/{id}:
+ *   get:
+ *     summary: Get client by ID
+ *     tags: [Commercial]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Client details
+ *       404:
+ *         description: Client not found
+ *   put:
+ *     summary: Update client
+ *     tags: [Commercial]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Client updated
+ *       404:
+ *         description: Client not found
+ */
 router.route('/clients/:id')
     .get(clientController.getClient)
     .put(clientController.updateClient);
 
+/**
+ * @swagger
+ * /clients/{id}/notes:
+ *   post:
+ *     summary: Add note to client
+ *     tags: [Commercial]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               content:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Note added
+ */
 router.post('/clients/:id/notes', clientController.addNote);
 
 /**
@@ -128,10 +309,81 @@ router.route('/negotiations')
     .get(negotiationController.getAllNegotiations)
     .post(negotiationController.createNegotiation);
 
+/**
+ * @swagger
+ * /negotiations/{id}:
+ *   get:
+ *     summary: Get negotiation by ID
+ *     tags: [Commercial]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Negotiation details
+ *       404:
+ *         description: Negotiation not found
+ */
 router.route('/negotiations/:id')
     .get(negotiationController.getNegotiation);
 
+/**
+ * @swagger
+ * /negotiations/{id}/messages:
+ *   post:
+ *     summary: Add message to negotiation
+ *     tags: [Commercial]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               content:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Message added
+ */
 router.post('/negotiations/:id/messages', negotiationController.addMessage);
+
+/**
+ * @swagger
+ * /negotiations/{id}/offer:
+ *   post:
+ *     summary: Make offer in negotiation
+ *     tags: [Commercial]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               price:
+ *                 type: number
+ *               terms:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Offer made
+ */
 router.post('/negotiations/:id/offer', negotiationController.makeOffer);
 
 module.exports = router;

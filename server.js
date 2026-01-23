@@ -5,8 +5,12 @@ const connectDB = require('./config/db');
 
 // Handle Uncaught Exceptions
 process.on('uncaughtException', err => {
+  console.error('UNCAUGHT EXCEPTION! 💥 Shutting down...');
+  console.error(err.name, err.message);
+  console.error(err.stack);
   logger.error('UNCAUGHT EXCEPTION! 💥 Shutting down...');
   logger.error(err.name, err.message);
+  logger.error(err.stack);
   process.exit(1);
 });
 

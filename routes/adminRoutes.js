@@ -28,7 +28,29 @@ router.use(authMiddleware.restrictTo('admin', 'superadmin'));
  *         description: System is healthy
  */
 router.get('/system/health', adminSystemController.getSystemHealth);
+
+/**
+ * @swagger
+ * /admin/system/logs:
+ *   get:
+ *     summary: Get system logs
+ *     tags: [Admin]
+ *     responses:
+ *       200:
+ *         description: System logs
+ */
 router.get('/system/logs', adminSystemController.getSystemLogs);
+
+/**
+ * @swagger
+ * /admin/system/metrics:
+ *   get:
+ *     summary: Get system metrics
+ *     tags: [Admin]
+ *     responses:
+ *       200:
+ *         description: System metrics
+ */
 router.get('/system/metrics', adminSystemController.getSystemMetrics);
 
 /**
@@ -113,6 +135,40 @@ router.route('/agencies/:id')
     .put(adminAgencyController.updateAgency)
     .delete(adminAgencyController.deleteAgency);
 
+/**
+ * @swagger
+ * /admin/agencies/{id}/kiosks:
+ *   get:
+ *     summary: Get agency kiosks
+ *     tags: [Admin]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of kiosks
+ *   post:
+ *     summary: Create kiosk for agency
+ *     tags: [Admin]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       201:
+ *         description: Kiosk created
+ */
 // Nested Kiosks
 router.route('/agencies/:id/kiosks')
     .get(adminAgencyController.getAgencyKiosks)

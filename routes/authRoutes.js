@@ -62,34 +62,197 @@ router.post('/register', authController.register);
  *         description: Login success
  */
 router.post('/login', authController.login);
+
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Logout user
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Logout success
+ */
 router.post('/logout', authController.logout);
+
+/**
+ * @swagger
+ * /auth/refresh:
+ *   post:
+ *     summary: Refresh authentication token
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: New token issued
+ */
 router.post('/refresh', authController.refreshToken);
+
+/**
+ * @swagger
+ * /auth/mfa/verify:
+ *   post:
+ *     summary: Verify MFA code
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               code:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: MFA verified
+ */
 router.post('/mfa/verify', authController.verifyMFA); // Public access for step 2 login
+
+/**
+ * @swagger
+ * /auth/qrcode/scan:
+ *   post:
+ *     summary: Scan QR code for kiosk
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               qrData:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: QR code scanned
+ */
 router.post('/qrcode/scan', authController.scanQRCode); // Public access for Kiosk without user session yet
 
+/**
+ * @swagger
+ * /auth/forgot-password:
+ *   post:
+ *     summary: Request password reset
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Reset link sent
+ */
 router.post('/forgot-password', authController.forgotPassword);
+
+/**
+ * @swagger
+ * /auth/reset-password/{token}:
+ *   post:
+ *     summary: Reset password with token
+ *     tags: [Auth]
+ *     parameters:
+ *       - in: path
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               password:
+ *                 type: string
+ *               passwordConfirm:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password reset successful
+ */
 router.post('/reset-password/:token', authController.resetPassword);
 
 // Protect all routes after this middleware
 router.use(authMiddleware.protect);
 
+/**
+ * @swagger
+ * /auth/update-password:
+ *   post:
+ *     summary: Update password (authenticated)
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               passwordCurrent:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               passwordConfirm:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password updated
+ */
 router.post('/update-password', authController.updatePassword);
 
+/**
+ * @swagger
+ * /auth/mfa/enable:
+ *   post:
+ *     summary: Enable MFA
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: MFA enabled
+ */
 // MFA Routes
 router.post('/mfa/enable', authController.enableMFA);
-router.post('/mfa/disable', authController.disableMFA);
-router.post('/mfa/verify', authController.verifyMFA); // Can be used logged in or for login step 2 (public usage needs handling in controller, I added logic there)
 
+/**
+ * @swagger
+ * /auth/mfa/disable:
+ *   post:
+ *     summary: Disable MFA
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: MFA disabled
+ */
+router.post('/mfa/disable', authController.disableMFA);
+
+/**
+ * @swagger
+ * /auth/qrcode/generate:
+ *   post:
+ *     summary: Generate QR code for MFA
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: QR code generated
+ */
 // QR / Kiosk
 router.post('/qrcode/generate', authController.generateQRCode);
-router.post('/qrcode/scan', authController.scanQRCode); // This should be public? Or protected by Kiosk Key? 
-// For now, I'll move scanQRCode to PUBLIC if it's meant to be called by an unauthenticated Kiosk initially.
-// But usually Kiosk has a service account.
-// Let's assume Kiosk is authenticated as a device separately.
-// For simplicity, I'll start with it protected (Kiosk must have a token) OR move it up.
-// Looking at the requirements: "POST /auth/kiosk/login" "Connexion directe depuis kiosk".
-// "POST /auth/qrcode/scan" "Scanner QR Code (kiosk)".
-// I'll make /qrcode/scan public for now to allow easier testing, or put it before protect.
 
 // router.get('/profile', authController.getProfile);
 // router.patch('/profile', authController.updateProfile);

@@ -49,6 +49,30 @@ exports.updateMyProfile = catchAsync(async (req, res, next) => {
     });
 });
 
+exports.updateConsents = catchAsync(async (req, res, next) => {
+    // Update user consent preferences (GDPR)
+    const { personalDataProcessing, marketingCommunication } = req.body;
+    
+    const user = await User.findByIdAndUpdate(
+        req.user.id,
+        {
+            consents: {
+                personalDataProcessing: personalDataProcessing !== undefined ? personalDataProcessing : true,
+                marketingCommunication: marketingCommunication !== undefined ? marketingCommunication : false
+            }
+        },
+        {
+            new: true,
+            runValidators: true
+        }
+    );
+    
+    res.status(200).json({
+        status: 'success',
+        data: { user }
+    });
+});
+
 const filterObj = (obj, ...allowedFields) => {
     const newObj = {};
     Object.keys(obj).forEach(el => {
