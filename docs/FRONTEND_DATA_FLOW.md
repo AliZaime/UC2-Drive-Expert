@@ -100,6 +100,33 @@ Login → Commercial Dashboard
      └─ Rapports
 ```
 
+### **MANAGER**
+```
+Login → Manager Dashboard
+  ├─ Dashboard (Statistics)
+  │  ├─ KPIs agence
+  │  ├─ Employés actifs
+  │  ├─ Véhicules en stock
+  │  └─ Négociations en cours
+  ├─ Gestion Employés
+  │  ├─ Liste
+  │  ├─ Ajouter employé
+  │  ├─ Modifier employé
+  │  └─ Désactiver employé
+  ├─ Info Agence
+  │  ├─ Détails agence
+  │  └─ Modifier (limité)
+  ├─ Véhicules Agence
+  │  └─ Liste lecture seule
+  ├─ Clients Agence
+  │  └─ Liste lecture seule
+  ├─ Négociations Agence
+  │  └─ Liste lecture seule
+  └─ Analytics Agence
+     ├─ Ventes par mois
+     └─ Performance employés
+```
+
 ### **ADMIN**
 ```
 Login → Admin Dashboard

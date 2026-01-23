@@ -10,12 +10,13 @@
 
 ### 🔐 Rôles & Permissions Utilisateurs
 
-Le système supporte **5 rôles principaux** :
+Le système supporte **6 rôles principaux** :
 
 | Rôle | Accès | Fonction |
 |------|-------|---------|
 | **superadmin** | Tous les endpoints admin | Gestion système complète, logs, métriques |
 | **admin** | Routes `/admin/*` | Gestion des agences, utilisateurs, impersonation |
+| **manager** | Routes `/manager/*` | Gestion employés & analytics d'une agence |
 | **user** | Routes commerciales | Agents/Commerciaux : gestion flottes, négociations |
 | **client** | Routes `/my/*` et `/public/*` | Clients : profil, rendez-vous, négociations |
 | **guest** | Routes `/public/*` | Visiteurs anonymes : browse véhicules, géoloc |

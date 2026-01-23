@@ -14,13 +14,14 @@ Real-time: WebSockets
 
 ---
 
-## 👥 5 rôles utilisateurs
+## 👥 6 rôles utilisateurs
 
 | Rôle | Accès | Principales Features |
 |------|-------|---------------------|
 | **Guest** | Public | Parcourir véhicules, Géolocalisation, Landing |
 | **Client** | Privé Client | Profil, Négociations, RDV, Contrats, Favoris |
 | **Commercial** | Backoffice | Fleet CRUD, Client CRM, Kanban négociations, Analytics |
+| **Manager** | Gestion Agence | Gestion employés, Analytics agence, Véhicules/Clients agence |
 | **Admin** | Gestion | Users CRUD, Agencies, Kiosks, Monitoring |
 | **SuperAdmin** | Système | Tous les accès + Audit, Logs, Security |
 
@@ -36,9 +37,10 @@ Real-time: WebSockets
 | Public | 4 | ⭐ |
 | Client | 10 | ⭐⭐ |
 | Commercial | 10 | ⭐⭐⭐ |
+| Manager | 8 | ⭐⭐⭐ |
 | Admin | 10 | ⭐⭐⭐ |
 | Shared | 5 | ⭐⭐ |
-| **TOTAL** | **45** | **Average ⭐⭐.5** |
+| **TOTAL** | **53** | **Average ⭐⭐.5** |
 
 ---
 

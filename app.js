@@ -75,6 +75,9 @@ app.use('/api/v1/sessions', sessionRouter);
 const adminRouter = require('./routes/adminRoutes');
 app.use('/api/v1/admin', adminRouter);
 
+const managerRouter = require('./routes/managerRoutes');
+app.use('/api/v1/manager', managerRouter);
+
 const commercialRouter = require('./routes/commercialRoutes');
 app.use('/api/v1', commercialRouter);
 

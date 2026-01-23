@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
     photo: String,
     role: {
         type: String,
-        enum: ['superadmin', 'admin', 'user', 'client', 'guest'],
+        enum: ['superadmin', 'admin', 'manager', 'user', 'client', 'guest'],
         default: 'user'
     },
     password: {
@@ -56,6 +56,12 @@ const userSchema = new mongoose.Schema({
     mfaSecret: {
         type: String,
         select: false
+    },
+
+    // Agency Assignment (for managers and users)
+    agency: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Agency'
     },
 
     // Privacy & Consents (GDPR)
