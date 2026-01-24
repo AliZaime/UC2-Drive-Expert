@@ -68,7 +68,7 @@ exports.register = catchAsync(async (req, res, next) => {
         email: req.body.email,
         password: req.body.password,
         confirmPassword: req.body.confirmPassword,
-        role: req.body.role || 'user' // Allow setting role for hackathon speed, secure later or restrict
+        role: 'user' // Security Fix: Force role to 'user' (Client) for public registration
     });
 
     createSendToken(newUser, 201, req, res);

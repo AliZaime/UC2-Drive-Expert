@@ -180,9 +180,14 @@ print(cars.json())
     ```bash
     npm install
     ```
-3.  **Configuration** :
+3.  **Tests (Nouveau)** :
+    Lancer la suite de tests unitaires et d'intégration (Jest) :
+    ```bash
+    npm test
+    ```
+4.  **Configuration** :
     Renommer `.env.example` en `.env` et remplir les clés (MONGO_URI, JWT_SECRET, CLOUDINARY...).
-4.  **Lancement** :
+5.  **Lancement** :
 
     ```bash
     npm start
@@ -190,7 +195,7 @@ print(cars.json())
 
     _Serveur sur port 4000 par défaut._
 
-5.  **Documentation API** :
+6.  **Documentation API** :
     Rendez-vous sur `http://localhost:4000/api-docs` pour tester les endpoints.
 
 ---

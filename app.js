@@ -78,12 +78,9 @@ app.use('/api/v1/admin', adminRouter);
 const managerRouter = require('./routes/managerRoutes');
 app.use('/api/v1/manager', managerRouter);
 
-const commercialRouter = require('./routes/commercialRoutes');
-app.use('/api/v1', commercialRouter);
-
 const clientRouter = require('./routes/clientRoutes');
-const notificationRoutes = require('./routes/notificationRoutes'); // New
-app.use('/api/v1/my', clientRouter); // /api/v1/my/profile, /api/v1/my/negotiations
+const notificationRoutes = require('./routes/notificationRoutes');
+app.use('/api/v1/my', clientRouter);
 app.use('/api/v1/notifications', notificationRoutes);
 
 const contractRoutes = require('./routes/contractRoutes');
@@ -91,6 +88,9 @@ app.use('/api/v1/contracts', contractRoutes);
 
 const guestRouter = require('./routes/guestRoutes');
 app.use('/api/v1/public', guestRouter); // /api/v1/public/browse
+
+const commercialRouter = require('./routes/commercialRoutes');
+app.use('/api/v1', commercialRouter);
 
 const analyticsRouter = require('./routes/analyticsRoutes');
 app.use('/api/v1/analytics', analyticsRouter);
