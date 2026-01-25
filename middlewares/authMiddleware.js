@@ -50,7 +50,10 @@ exports.protect = catchAsync(async (req, res, next) => {
 exports.restrictTo = (...roles) => {
     return (req, res, next) => {
         // roles ['admin', 'lead-guide']. role='user'
+        console.log(`[Auth] Checking permission for user: ${req.user.email} (${req.user.role}) against allowed: ${roles}`);
+        
         if (!roles.includes(req.user.role)) {
+            console.log(`[Auth] Permission system denied access. User role '${req.user.role}' not in [${roles}]`);
             return next(
                 new AppError('You do not have permission to perform this action', 403)
             );

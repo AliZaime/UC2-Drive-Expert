@@ -30,8 +30,8 @@ const limiter = limit({
 app.use('/api', limiter);
 
 // Body parser, reading data from body into req.body
-app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Data sanitization against XSS
 // Data sanitization against XSS
@@ -97,6 +97,14 @@ app.use('/api/v1/analytics', analyticsRouter);
 
 const utilityRouter = require('./routes/utilityRoutes');
 app.use('/api/v1/utils', utilityRouter);
+
+const conversationRouter = require('./routes/conversations');
+app.use('/api/v1/conversations', conversationRouter);
+
+const uploadRouter = require('./routes/upload');
+app.use('/api/v1/upload', uploadRouter);
+
+
 
 // Note: User requirements listed "GET /dashboard/overview" not "GET /api/v1/dashboard/overview"
 // But for consistency we usually prefix /api/v1. 

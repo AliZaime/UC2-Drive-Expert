@@ -79,7 +79,7 @@ router.get('/dashboard/kpis', dashboardController.getKPIs);
  */
 router.route('/vehicles')
     .get(vehicleController.getAllVehicles)
-    .post(authMiddleware.restrictTo('manager', 'admin'), vehicleController.createVehicle);
+    .post(authMiddleware.restrictTo('manager', 'admin', 'user'), vehicleController.createVehicle);
 
 /**
  * @swagger
@@ -135,8 +135,8 @@ router.route('/vehicles')
  */
 router.route('/vehicles/:id')
     .get(vehicleController.getVehicle)
-    .put(authMiddleware.restrictTo('manager', 'admin'), vehicleController.updateVehicle)
-    .delete(authMiddleware.restrictTo('manager', 'admin'), vehicleController.deleteVehicle);
+    .put(authMiddleware.restrictTo('superadmin', 'manager', 'admin', 'user'), vehicleController.updateVehicle)
+    .delete(authMiddleware.restrictTo('superadmin', 'manager', 'admin', 'user'), vehicleController.deleteVehicle);
 
 /**
  * @swagger
@@ -166,7 +166,7 @@ router.route('/vehicles/:id')
  *       200:
  *         description: Photos uploaded successfully
  */
-router.post('/vehicles/:id/photos', authMiddleware.restrictTo('manager', 'admin'), vehicleController.uploadPhotosMiddleware, vehicleController.uploadVehiclePhotos);
+router.post('/vehicles/:id/photos', authMiddleware.restrictTo('manager', 'admin', 'user'), vehicleController.uploadPhotosMiddleware, vehicleController.uploadVehiclePhotos);
 
 /**
  * @swagger

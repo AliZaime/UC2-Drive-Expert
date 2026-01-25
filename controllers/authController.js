@@ -68,7 +68,7 @@ exports.register = catchAsync(async (req, res, next) => {
         email: req.body.email,
         password: req.body.password,
         confirmPassword: req.body.confirmPassword,
-        role: 'user' // Security Fix: Force role to 'user' (Client) for public registration
+        role: 'client' // Security Fix: Force role to 'client' for public registration
     });
 
     createSendToken(newUser, 201, req, res);

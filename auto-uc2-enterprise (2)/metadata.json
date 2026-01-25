@@ -1,0 +1,7 @@
+{
+  "name": "Auto-UC2 Enterprise",
+  "description": "Next-gen automotive management with AI negotiations and QR portals.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

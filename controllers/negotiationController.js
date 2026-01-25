@@ -3,7 +3,13 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
 
 exports.getAllNegotiations = catchAsync(async (req, res, next) => {
-    const negotiations = await Negotiation.find()
+    let filter = {};
+    if (req.user.role === 'client') {
+        filter = { client: req.user.id };
+    }
+    // Agents & Managers can see all for now (or filter by agency if implemented later)
+
+    const negotiations = await Negotiation.find(filter)
         .populate('vehicle', 'make model vin')
         .populate('client', 'firstName lastName');
         

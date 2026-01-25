@@ -123,24 +123,37 @@ exports.uploadPhotosMiddleware = upload.array('photos', 5); // Max 5 photos
 
 exports.uploadVehiclePhotos = catchAsync(async (req, res, next) => {
     // req.files is populated by the middleware
+    console.log("UPLOAD DEBUG - req.files:", req.files);
+    
     if (!req.files || req.files.length === 0) {
         return next(new AppError('No photos uploaded', 400));
     }
 
     const vehicle = await Vehicle.findById(req.params.id);
     if (!vehicle) return next(new AppError('No vehicle found', 404));
+    
+    console.log("UPLOAD DEBUG - Found Vehicle:", vehicle._id);
 
     // Extract Cloudinary URLs
     const photoUrls = req.files.map(file => file.path);
+    console.log("UPLOAD DEBUG - Photo URLs:", photoUrls);
 
-    // Push to vehicle photos array
-    vehicle.photos.push(...photoUrls);
-    await vehicle.save();
+    // Push to vehicle images array
+    if (!vehicle.images) vehicle.images = []; // Safety check
+    vehicle.images.push(...photoUrls);
+    
+    try {
+        await vehicle.save();
+        console.log("UPLOAD DEBUG - Save Success");
+    } catch (saveError) {
+        console.error("UPLOAD DEBUG - Save Error:", saveError);
+        return next(new AppError('Database Save Failed: ' + saveError.message, 500));
+    }
 
     res.status(200).json({ 
         status: 'success', 
         message: 'Photos uploaded successfully',
-        data: { photos: photoUrls } 
+        data: { images: photoUrls } 
     });
 });
 

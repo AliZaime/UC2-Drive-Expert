@@ -12,7 +12,7 @@ const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'auto-uc2-uploads',
-        allowed_formats: ['jpg', 'png', 'jpeg', 'pdf'],
+        allowed_formats: ['jpg', 'png', 'jpeg', 'pdf', 'webp'],
         resource_type: 'auto' // Detect image vs pdf
     }
 });
