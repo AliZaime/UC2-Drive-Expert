@@ -83,6 +83,27 @@ router.route('/vehicles')
 
 /**
  * @swagger
+ * /vehicles/search:
+ *   get:
+ *     summary: Search vehicles by VIN, make or model
+ *     tags: [Commercial]
+ *     parameters:
+ *       - in: query
+ *         name: query
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Search term (VIN, make/brand, or model)
+ *     responses:
+ *       200:
+ *         description: Search results
+ *       400:
+ *         description: Search query is required
+ */
+router.get('/vehicles/search', vehicleController.searchVehicles);
+
+/**
+ * @swagger
  * /vehicles/{id}:
  *   get:
  *     summary: Get vehicle by ID
@@ -212,6 +233,27 @@ router.get('/vehicles/:id/valuation', vehicleController.valueVehicle);
 router.route('/clients')
     .get(clientController.getAllClients)
     .post(clientController.createClient);
+
+/**
+ * @swagger
+ * /clients/search:
+ *   get:
+ *     summary: Search clients by name or contact info
+ *     tags: [Commercial]
+ *     parameters:
+ *       - in: query
+ *         name: query
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Search term (first name, last name, email, phone)
+ *     responses:
+ *       200:
+ *         description: Search results
+ *       400:
+ *         description: Search query is required
+ */
+router.get('/clients/search', clientController.searchClients);
 
 /**
  * @swagger

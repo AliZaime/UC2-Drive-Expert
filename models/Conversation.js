@@ -8,13 +8,21 @@ const conversationSchema = new mongoose.Schema({
     }],
     client: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Client',
+        ref: 'User',
         required: true
     },
     agent: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
+    },
+    vehicleId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Vehicle'
+    },
+    subject: {
+        type: String,
+        default: ''
     },
     lastMessage: {
         type: String,

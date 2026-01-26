@@ -5,6 +5,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL
 
 interface RequestOptions extends RequestInit {
   data?: any;
+    params?: Record<string, any>;
 }
 
 export const api = {
@@ -36,7 +37,23 @@ export const api = {
       config.body = isFormData ? data : JSON.stringify(data);
     }
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+      let finalEndpoint = `${API_BASE_URL}${endpoint}`;
+    
+      // Handle query parameters
+      if (customConfig.params && typeof customConfig.params === 'object') {
+        const queryParams = new URLSearchParams();
+        Object.entries(customConfig.params).forEach(([key, value]) => {
+          if (value !== null && value !== undefined) {
+            queryParams.append(key, String(value));
+          }
+        });
+        const queryString = queryParams.toString();
+        if (queryString) {
+          finalEndpoint += `?${queryString}`;
+        }
+      }
+
+      const response = await fetch(finalEndpoint, config);
     
     const text = await response.text();
     let result;
@@ -63,6 +80,10 @@ export const api = {
 
   put<T = any>(endpoint: string, data?: any, options?: RequestOptions): Promise<T> {
     return this.request<T>(endpoint, { ...options, method: 'PUT', data });
+  },
+
+  patch<T = any>(endpoint: string, data?: any, options?: RequestOptions): Promise<T> {
+    return this.request<T>(endpoint, { ...options, method: 'PATCH', data });
   },
 
   delete<T = any>(endpoint: string, options?: RequestOptions): Promise<T> {

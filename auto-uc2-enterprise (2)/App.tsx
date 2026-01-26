@@ -54,7 +54,6 @@ const AppContent: React.FC<{ user: User | null; onLogin: (u: User) => void; onLo
                   {user.role === UserRole.CLIENT && (
                     <>
                       <Route path="/client/saved" element={<ClientSaved />} />
-                      <Route path="/client/recommended" element={<ClientSaved />} />
                       <Route path="/client/appointments" element={<ClientAppointments />} />
                       <Route path="/client/contracts" element={<ClientContracts />} />
                       <Route path="/client/deals/won" element={<Negotiations />} />

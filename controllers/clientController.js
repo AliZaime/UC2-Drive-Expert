@@ -12,6 +12,37 @@ exports.getAllClients = catchAsync(async (req, res, next) => {
     });
 });
 
+// Search clients by name or contact
+exports.searchClients = catchAsync(async (req, res, next) => {
+    let { query } = req.query;
+
+    if (typeof query === 'string') {
+        query = query.trim();
+    }
+
+    if (!query || query.length === 0) {
+        return next(new AppError('Search query is required', 400));
+    }
+
+    // Match on firstName, lastName, combined name, email, or phone
+    const regex = new RegExp(query, 'i');
+    const clients = await Client.find({
+        $or: [
+            { firstName: regex },
+            { lastName: regex },
+            { email: regex },
+            { phone: regex },
+            { fullName: regex }
+        ]
+    }).limit(50);
+
+    res.status(200).json({
+        status: 'success',
+        results: clients.length,
+        data: { clients }
+    });
+});
+
 exports.createClient = catchAsync(async (req, res, next) => {
     // Auto-assign to current user if not specified
     if (!req.body.assignedAgent) req.body.assignedAgent = req.user.id;

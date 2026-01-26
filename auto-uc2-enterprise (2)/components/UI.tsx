@@ -74,7 +74,7 @@ export const Badge: React.FC<BadgeProps> = ({ children, variant = 'neutral' }) =
   );
 };
 
-export const Input: React.FC<any> = ({ label, error, className, icon: Icon, ...props }) => (
+export const Input: React.FC<any> = ({ label, error, className, icon: Icon, rightElement, ...props }) => (
   <div className="w-full space-y-2">
     {label && <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest block ml-1">{label}</label>}
     <div className="relative">
@@ -88,6 +88,11 @@ export const Input: React.FC<any> = ({ label, error, className, icon: Icon, ...p
         )}
         {...props}
       />
+      {rightElement && (
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+          {rightElement}
+        </div>
+      )}
     </div>
     {error && <p className="text-[10px] text-red-500 font-bold uppercase tracking-wider ml-1">{error}</p>}
   </div>

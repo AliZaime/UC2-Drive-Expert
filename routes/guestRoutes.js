@@ -1,6 +1,7 @@
 const express = require('express');
 const guestController = require('../controllers/guestController');
 const kioskController = require('../controllers/kioskController');
+const adminAgencyController = require('../controllers/adminAgencyController');
 // const authMiddleware = require('../middlewares/authMiddleware');
 
 const router = express.Router();
@@ -161,5 +162,8 @@ router.post('/kiosk/heartbeat', kioskController.heartbeat); // Typically auth'd
  *         description: Kiosk configuration
  */
 router.get('/kiosk/:id/config', kioskController.getConfig);
+
+// Get available users from agency (for client contact) - Public endpoint
+router.get('/agencies/:id/available-users', adminAgencyController.getAgencyAvailableUsers);
 
 module.exports = router;

@@ -66,9 +66,9 @@ const userSchema = new mongoose.Schema({
 
     // Privacy & Consents (GDPR)
     consents: {
-        personalDataProcessing: { type: Boolean, default: false }, // Use of personal info
-        marketingCommunication: { type: Boolean, default: false }, // Contact by agents/marketing
-        thirdPartySharing: { type: Boolean, default: false },
+        personalDataProcessing: { type: Boolean, default: false }, // Traitement des données personnelles
+        registrationDataUsage: { type: Boolean, default: false }, // Utilisation des données d'inscription
+        conversationDataUsage: { type: Boolean, default: false }, // Utilisation des données de conversation (chat socket & négociation IA)
         updatedAt: Date
     },
     
