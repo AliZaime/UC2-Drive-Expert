@@ -174,4 +174,7 @@ router.route('/agencies/:id/kiosks')
     .get(adminAgencyController.getAgencyKiosks)
     .post(adminAgencyController.createAgencyKiosk);
 
+// Get available users from agency (for client contact)
+router.get('/agencies/:id/available-users', adminAgencyController.getAgencyAvailableUsers);
+
 module.exports = router;

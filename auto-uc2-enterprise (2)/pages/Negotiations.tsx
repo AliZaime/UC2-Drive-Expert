@@ -107,11 +107,15 @@ export const Negotiations = () => {
 
   const handleSelectConversation = async (conversation: any) => {
     setSelectedConversation(conversation);
+    setMessages([]); // Clear messages immediately
     
     // Fetch messages
     try {
       const response = await api.get(`/conversations/${conversation._id}/messages`);
-      setMessages(response.data.messages || []);
+      // Handle both response formats: {messages} and {data: {messages}}
+      const msgs = response.data?.messages || response.data?.data?.messages || [];
+      console.log(`📝 Loaded ${msgs.length} messages for conversation ${conversation._id}`);
+      setMessages(msgs);
       
       // Mark as read
       if (socket) {
@@ -119,6 +123,7 @@ export const Negotiations = () => {
       }
     } catch (error) {
       console.error('Error fetching messages:', error);
+      setMessages([]);
     }
   };
 
@@ -220,7 +225,10 @@ export const Negotiations = () => {
               Aucune conversation active.
             </div>
           ) : conversations.map(conv => {
-            const clientName = conv.client ? `${conv.client.firstName} ${conv.client.lastName}` : 'Client';
+            // Show the name of the other person in the conversation
+            const isMe = (id: string) => id === currentUserId;
+            const otherPerson = isMe(conv.client?._id) ? conv.agent : conv.client;
+            const displayName = otherPerson?.name || 'Contact';
             
             return (
               <button
@@ -238,8 +246,13 @@ export const Negotiations = () => {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex justify-between items-start mb-1">
-                    <h4 className="font-bold text-white truncate">{clientName}</h4>
-                    <span className="text-[10px] font-bold text-zinc-600 uppercase shrink-0">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-white truncate">{displayName}</h4>
+                      {conv.subject && (
+                        <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest truncate">{conv.subject}</p>
+                      )}
+                    </div>
+                    <span className="text-[10px] font-bold text-zinc-600 uppercase shrink-0 ml-2">
                       {new Date(conv.lastMessageAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
@@ -272,27 +285,44 @@ export const Negotiations = () => {
           {/* Chat Header - Fixed at top */}
           <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-zinc-950/20 backdrop-blur-md">
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-zinc-800 rounded-full flex items-center justify-center font-black text-emerald-500 border border-white/10 shadow-sm">
-                {selectedConversation.client?.firstName?.charAt(0) || 'C'}
-              </div>
-              <div>
-                <h3 className="font-black text-white leading-tight">
-                  {selectedConversation.client ? `${selectedConversation.client.firstName} ${selectedConversation.client.lastName}` : 'Client'}
-                </h3>
-                <p className="text-xs text-zinc-500 flex items-center gap-2">
-                  {isTyping ? (
-                    <>
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                      En train d'écrire...
-                    </>
-                  ) : (
-                    <>
-                      <span className={cn("w-2 h-2 rounded-full", isConnected ? "bg-green-500" : "bg-zinc-600")}></span>
-                      {isConnected ? 'En ligne' : 'Hors ligne'}
-                    </>
-                  )}
-                </p>
-              </div>
+              {/* Determine who is the other person in the conversation */}
+              {(() => {
+                const isMe = (id: string) => id === currentUserId;
+                const otherPerson = isMe(selectedConversation.client?._id) ? selectedConversation.agent : selectedConversation.client;
+                const otherName = otherPerson?.name || 'Contact';
+                const otherInitial = otherName?.charAt(0) || 'C';
+                
+                return (
+                  <>
+                    <div className="w-10 h-10 bg-zinc-800 rounded-full flex items-center justify-center font-black text-emerald-500 border border-white/10 shadow-sm">
+                      {otherInitial}
+                    </div>
+                    <div>
+                      <h3 className="font-black text-white leading-tight">
+                        {otherName}
+                      </h3>
+                      {selectedConversation?.subject && (
+                        <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">
+                          {selectedConversation.subject}
+                        </p>
+                      )}
+                      <p className="text-xs text-zinc-500 flex items-center gap-2">
+                        {isTyping ? (
+                          <>
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            En train d'écrire...
+                          </>
+                        ) : (
+                          <>
+                            <span className={cn("w-2 h-2 rounded-full", isConnected ? "bg-green-500" : "bg-zinc-600")}></span>
+                            {isConnected ? 'En ligne' : 'Hors ligne'}
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
             <div className="flex items-center gap-2">
               <button className="p-2 text-zinc-400 hover:bg-white/5 hover:text-emerald-500 rounded-lg transition-all border border-transparent hover:border-white/10"><Phone size={18} /></button>
@@ -310,8 +340,12 @@ export const Negotiations = () => {
                 </div>
                 <h3 className="text-xl font-black text-white mb-2">Nouvelle conversation</h3>
                 <p className="text-sm text-zinc-500 max-w-md">
-                  Commencez la conversation avec {selectedConversation.client?.firstName || 'le client'}. 
-                  Vos messages apparaîtront ici.
+                  {(() => {
+                    const isMe = (id: string) => id === currentUserId;
+                    const otherPerson = isMe(selectedConversation.client?._id) ? selectedConversation.agent : selectedConversation.client;
+                    const otherName = otherPerson?.name || 'votre contact';
+                    return `Commencez la conversation avec ${otherName}. Vos messages apparaîtront ici.`;
+                  })()}
                 </p>
               </div>
             ) : (

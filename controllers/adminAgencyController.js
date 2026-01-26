@@ -90,3 +90,88 @@ exports.createAgencyKiosk = catchAsync(async (req, res, next) => {
         data: { kiosk: newKiosk }
     });
 });
+
+// Get next available user from agency using round-robin (for client contact)
+exports.getAgencyAvailableUsers = catchAsync(async (req, res, next) => {
+    const { id: agencyId } = req.params;
+    
+    const User = require('../models/User');
+    
+    // Get all users in this agency (managers and staff only)
+    const users = await User.find({ 
+        agency: agencyId,
+        role: { $in: ['manager', 'user'] } // Only managers and staff
+    }).select('_id name email role').sort('_id');
+    
+    if (!users || users.length === 0) {
+        return res.status(200).json({
+            status: 'success',
+            data: []
+        });
+    }
+    
+    // If only one user, return them
+    if (users.length === 1) {
+        const user = users[0];
+        const [firstName, ...lastNameParts] = (user.name || '').split(' ');
+        const lastName = lastNameParts.join(' ') || '';
+        
+        return res.status(200).json({
+            status: 'success',
+            data: [{
+                id: user._id,
+                firstName: firstName,
+                lastName: lastName,
+                email: user.email,
+                role: user.role
+            }]
+        });
+    }
+    
+    // Round-robin: get user with least conversations
+    const Conversation = require('../models/Conversation');
+    const userLoads = {};
+    
+    // Initialize load for each user
+    users.forEach(u => {
+        userLoads[u._id.toString()] = 0;
+    });
+    
+    // Count conversations per user
+    const conversations = await Conversation.find({
+        agent: { $in: users.map(u => u._id) }
+    }).select('agent');
+    
+    conversations.forEach(conv => {
+        const agentId = conv.agent.toString();
+        if (userLoads.hasOwnProperty(agentId)) {
+            userLoads[agentId]++;
+        }
+    });
+    
+    // Find user with least conversations (round-robin load balancing)
+    let selectedUser = users[0];
+    let minLoad = userLoads[selectedUser._id.toString()];
+    
+    for (const user of users) {
+        const load = userLoads[user._id.toString()];
+        if (load < minLoad) {
+            selectedUser = user;
+            minLoad = load;
+        }
+    }
+    
+    const [firstName, ...lastNameParts] = (selectedUser.name || '').split(' ');
+    const lastName = lastNameParts.join(' ') || '';
+    
+    res.status(200).json({
+        status: 'success',
+        data: [{
+            id: selectedUser._id,
+            firstName: firstName,
+            lastName: lastName,
+            email: selectedUser.email,
+            role: selectedUser.role
+        }]
+    });
+});

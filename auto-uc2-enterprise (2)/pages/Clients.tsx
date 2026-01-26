@@ -10,11 +10,19 @@ import { ClientFormModal } from '../components/modals/ClientFormModal';
 export const Clients = () => {
   const navigate = useNavigate();
   const [clients, setClients] = useState<any[]>([]);
+  const [filteredClients, setFilteredClients] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('');
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [creatingConversation, setCreatingConversation] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const statusSelectRef = useRef<HTMLSelectElement | null>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const fetchClients = async () => {
@@ -29,6 +37,8 @@ export const Clients = () => {
           status: c.status || 'Lead',
         }));
         setClients(normalized);
+        setSearchResults(normalized);
+        setFilteredClients(normalized);
       } catch (err) {
         console.error('Failed to fetch clients', err);
       } finally {
@@ -37,6 +47,64 @@ export const Clients = () => {
     };
     fetchClients();
   }, []);
+
+  const applyFilters = (list: any[], status: string) => {
+    if (!status) return list;
+    return list.filter(c => (c.status || '').toLowerCase() === status.toLowerCase());
+  };
+
+  // Search clients by name/email/phone
+  const performSearch = async (query: string) => {
+    setSearchQuery(query);
+
+    // Clear debounce timer
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Empty query -> reset list
+    if (!query || !query.trim()) {
+      setSearchResults(clients);
+      setFilteredClients(applyFilters(clients, statusFilter));
+      setSearchLoading(false);
+      return;
+    }
+
+    setSearchLoading(true);
+    searchTimeoutRef.current = setTimeout(async () => {
+      const trimmed = query.trim();
+      if (!trimmed) {
+        setFilteredClients(clients);
+        setSearchLoading(false);
+        return;
+      }
+
+      try {
+        const response = await api.get<any>('/clients/search', { params: { query: trimmed } });
+        const data = response.data.data ? response.data.data.clients : (response.data.clients || []);
+        const normalized = data.map((c: any) => ({
+          ...c,
+          id: c._id || c.id,
+          name: `${c.firstName} ${c.lastName}`,
+          lastActivity: new Date(c.updatedAt || Date.now()).toLocaleDateString(),
+          status: c.status || 'Lead',
+        }));
+        setSearchResults(normalized);
+        setFilteredClients(applyFilters(normalized, statusFilter));
+      } catch (err) {
+        console.error('Client search failed', err);
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 300);
+  };
+
+  const handleStatusChange = (value: string) => {
+    setStatusFilter(value);
+    setShowStatusDropdown(false);
+    const base = searchQuery ? searchResults : clients;
+    setFilteredClients(applyFilters(base, value));
+  };
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -100,8 +168,48 @@ export const Clients = () => {
 
       <Card>
         <div className="flex flex-col lg:flex-row gap-4 mb-8">
-          <Input icon={Search} placeholder="Rechercher un client..." className="flex-1" />
-          <Button variant="outline"><Filter size={18} /> Filtrer par statut</Button>
+          <Input
+            icon={Search}
+            placeholder="Rechercher un client..."
+            className="flex-1"
+            value={searchQuery}
+            onChange={(e) => performSearch(e.target.value)}
+            rightElement={searchLoading ? <Loader2 size={16} className="animate-spin text-emerald-500" /> : null}
+          />
+          <div className="relative">
+            <Button
+              variant="outline"
+              onClick={() => setShowStatusDropdown((v) => !v)}
+              className="flex items-center gap-2"
+            >
+              <Filter size={18} />
+              {statusFilter ? statusFilter : 'Statut'}
+            </Button>
+
+            {showStatusDropdown && (
+              <div className="absolute right-0 mt-2 w-44 bg-zinc-950/90 border border-white/10 rounded-2xl shadow-2xl backdrop-blur-xl z-50 overflow-hidden">
+                {[
+                  { label: 'Tous les statuts', value: '' },
+                  { label: 'Lead', value: 'Lead' },
+                  { label: 'Prospect', value: 'Prospect' },
+                  { label: 'Active', value: 'Active' },
+                  { label: 'Customer', value: 'Customer' },
+                ].map((opt) => (
+                  <button
+                    key={opt.value || 'all'}
+                    onClick={() => handleStatusChange(opt.value)}
+                    className={`w-full text-left px-4 py-3 text-sm transition-colors ${
+                      statusFilter === opt.value
+                        ? 'bg-emerald-500/10 text-emerald-300'
+                        : 'text-zinc-200 hover:bg-white/5'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         <Table headers={['Client', 'Contact', 'Engagement', 'Statut', 'Actions']}>
@@ -112,13 +220,13 @@ export const Clients = () => {
                 <p className="mt-4 text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Chargement des clients...</p>
               </td>
             </tr>
-          ) : clients.length === 0 ? (
+          ) : filteredClients.length === 0 ? (
             <tr>
               <td colSpan={5} className="py-20 text-center text-zinc-500 italic">
-                Aucun client trouvé.
+                {searchQuery ? 'Aucun client trouvé pour votre recherche.' : 'Aucun client trouvé.'}
               </td>
             </tr>
-          ) : clients.map(c => (
+          ) : filteredClients.map(c => (
             <tr key={c.id} className="group hover:bg-white/[0.02] transition-colors">
               <td className="px-4 py-4">
                 <div className="flex items-center gap-3">

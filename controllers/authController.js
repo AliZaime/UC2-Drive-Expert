@@ -245,28 +245,47 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
         return next(new AppError('Your current password is wrong', 401));
     }
 
-    // 3) Update password
-    user.password = req.body.password;
-    user.confirmPassword = req.body.confirmPassword;
-    await user.save();
+    // 3) Validate that new password and confirmation match
+    if (req.body.password !== req.body.passwordConfirm) {
+        return next(new AppError('Passwords do not match', 400));
+    }
 
-    // 4) Log user in, send JWT
+    // 4) Update password
+    user.password = req.body.password;
+    user.confirmPassword = req.body.passwordConfirm;
+    await user.save({ validateBeforeSave: false });
+
+    // 5) Log user in, send JWT
     createSendToken(user, 200, req, res);
 });
 
 exports.enableMFA = catchAsync(async (req, res, next) => {
+    console.log('[enableMFA] Starting MFA setup...');
+    console.log('[enableMFA] req.user:', req.user);
+    
+    if (!req.user || !req.user.id) {
+        console.error('[enableMFA] No user found in request');
+        return next(new AppError('User not authenticated', 401));
+    }
+    
     const user = await User.findById(req.user.id).select('+mfaSecret');
+    console.log('[enableMFA] User found:', user ? user.email : 'null');
     
     // Generate secret
     const secret = authenticator.generateSecret();
+    console.log('[enableMFA] Secret generated');
     
     // Save secret to user
     user.mfaSecret = secret;
     await user.save({ validateBeforeSave: false });
+    console.log('[enableMFA] Secret saved to database');
     
     // Generate QR Code
     const otpauth = authenticator.keyuri(user.email, 'Auto-UC2', secret);
+    console.log('[enableMFA] OTP URI created');
+    
     const imageUrl = await qrcode.toDataURL(otpauth);
+    console.log('[enableMFA] QR code generated');
     
     res.status(200).json({
         status: 'success',

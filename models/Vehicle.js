@@ -54,6 +54,17 @@ const vehicleSchema = new mongoose.Schema({
         required: [true, 'A vehicle must belong to an agency']
     },
     
+    // User who created/added this vehicle
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    
+    addedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    
     images: [String],
     
     features: [String],

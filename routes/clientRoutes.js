@@ -48,6 +48,28 @@ router.get('/profile', clientProfileController.getMyProfile);
  */
 router.patch('/profile', clientProfileController.updateMyProfile);
 
+/**
+ * @swagger
+ * /my/profile/photo:
+ *   patch:
+ *     summary: Update profile photo
+ *     tags: [Client]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               photo:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Photo updated
+ */
+router.patch('/profile/photo', clientProfileController.uploadMiddleware, clientProfileController.updateMyProfilePhoto);
+
 // Privacy / COnsents
 /**
  * @swagger

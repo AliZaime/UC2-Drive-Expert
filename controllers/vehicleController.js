@@ -55,7 +55,7 @@ exports.getAllVehicles = catchAsync(async (req, res, next) => {
         .sort()
         .paginate();
         
-    const vehicles = await features.query;
+    const vehicles = await features.query.populate('agency', 'name address phone email');
     
     res.status(200).json({
         status: 'success',
@@ -65,7 +65,7 @@ exports.getAllVehicles = catchAsync(async (req, res, next) => {
 });
 
 exports.getVehicle = catchAsync(async (req, res, next) => {
-    const vehicle = await Vehicle.findById(req.params.id);
+    const vehicle = await Vehicle.findById(req.params.id).populate('agency', 'name address phone email');
     
     if (!vehicle) {
         return next(new AppError('No vehicle found with that ID', 404));
@@ -78,6 +78,13 @@ exports.getVehicle = catchAsync(async (req, res, next) => {
 });
 
 exports.createVehicle = catchAsync(async (req, res, next) => {
+    // Automatically assign the agency of the logged-in user/manager
+    if (req.user && req.user.agency) {
+        req.body.agency = req.user.agency;
+    } else if (!req.body.agency) {
+        return next(new AppError('Agency is required. User must be assigned to an agency.', 400));
+    }
+    
     const newVehicle = await Vehicle.create(req.body);
     
     res.status(201).json({
@@ -168,4 +175,29 @@ exports.valueVehicle = catchAsync(async (req, res, next) => {
     };
     
     res.status(200).json({ status: 'success', data: { valuation } });
+});
+
+exports.searchVehicles = catchAsync(async (req, res, next) => {
+    const { query } = req.query;
+    
+    if (!query) {
+        return next(new AppError('Search query is required', 400));
+    }
+    
+    // Search by VIN, make (brand), or model
+    const searchRegex = new RegExp(query, 'i'); // Case-insensitive search
+    
+    const vehicles = await Vehicle.find({
+        $or: [
+            { vin: searchRegex },
+            { make: searchRegex },
+            { model: searchRegex }
+        ]
+    }).limit(50);
+    
+    res.status(200).json({
+        status: 'success',
+        results: vehicles.length,
+        data: { vehicles }
+    });
 });

@@ -6,6 +6,7 @@ import {
   Wrench, Zap, TrendingUp, Info 
 } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
+import { useNavigate } from 'react-router-dom';
 
 import { api } from '../api';
 import { Vehicle, UserRole } from '../types';
@@ -18,7 +19,15 @@ import { ConfirmationModal } from '../components/modals/ConfirmationModal';
 import { MOCK_VEHICLES } from '../constants';
 export const Vehicles = () => {
   const { addToast } = useToast();
+  const navigate = useNavigate();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [filteredVehicles, setFilteredVehicles] = useState<Vehicle[]>([]);
+  const [savedVehicles, setSavedVehicles] = useState<string[]>(() => {
+    const saved = localStorage.getItem('saved_vehicles');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchLoading, setSearchLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState<string | null>(null);
   const [analysisResult, setAnalysisResult] = useState<{ text: string, links: any[] } | null>(null);
@@ -31,6 +40,9 @@ export const Vehicles = () => {
     vehicleId: null
   });
 
+  // Debounce timer for search
+  const searchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
   const fetchVehicles = async () => {
     setLoading(true);
     try {
@@ -42,8 +54,17 @@ export const Vehicles = () => {
         id: v._id || v.id,
         brand: v.make || v.brand,
         image: v.images?.[0] || v.image || 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80',
+        agencyId: v.agency?._id || v.agency?.id || v.agencyId,
+        agency: typeof v.agency === 'object' ? {
+          id: v.agency._id || v.agency.id,
+          name: v.agency.name,
+          address: v.agency.address,
+          phone: v.agency.phone,
+          email: v.agency.email
+        } : v.agency
       }));
       setVehicles(normalized);
+      setFilteredVehicles(normalized);
     } catch (err) {
       console.error('Failed to fetch vehicles', err);
     } finally {
@@ -51,9 +72,68 @@ export const Vehicles = () => {
     }
   };
 
+  const performSearch = async (query: string) => {
+    setSearchQuery(query);
+    
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    
+    // If query is empty, show all vehicles
+    if (!query || !query.trim()) {
+      setFilteredVehicles(vehicles);
+      setSearchLoading(false);
+      return;
+    }
+
+    // Debounce search API call
+    setSearchLoading(true);
+    searchTimeoutRef.current = setTimeout(async () => {
+      try {
+        const trimmedQuery = query.trim();
+        if (!trimmedQuery) {
+          setFilteredVehicles(vehicles);
+          setSearchLoading(false);
+          return;
+        }
+
+        const response = await api.get<any>('/vehicles/search', {
+          params: { query: trimmedQuery }
+        });
+        const data = response.data.data ? response.data.data.vehicles : (response.data.vehicles || []);
+
+        const normalized = data.map((v: any) => ({
+          ...v,
+          id: v._id || v.id,
+          brand: v.make || v.brand,
+          image: v.images?.[0] || v.image || 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80',
+          agencyId: v.agency?._id || v.agency?.id || v.agencyId,
+          agency: typeof v.agency === 'object' ? {
+            id: v.agency._id || v.agency.id,
+            name: v.agency.name,
+            address: v.agency.address,
+            phone: v.agency.phone,
+            email: v.agency.email
+          } : v.agency
+        }));
+        setFilteredVehicles(normalized);
+      } catch (err) {
+        console.error('Search failed', err);
+        addToast('Erreur lors de la recherche', 'error');
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 300); // Wait 300ms after user stops typing
+  };
+
   useEffect(() => {
     fetchVehicles();
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('saved_vehicles', JSON.stringify(savedVehicles));
+  }, [savedVehicles]);
 
   const performMarketAnalysis = async (vehicle: any) => {
     setAnalyzing(vehicle.id);
@@ -76,6 +156,19 @@ export const Vehicles = () => {
     } finally {
       setAnalyzing(null);
     }
+  };
+
+  const toggleSaveVehicle = (vehicleId: string) => {
+    if (savedVehicles.includes(vehicleId)) {
+      setSavedVehicles(savedVehicles.filter(id => id !== vehicleId));
+      addToast('Véhicule retiré de sauvegardé', 'success');
+    } else {
+      setSavedVehicles([...savedVehicles, vehicleId]);
+      addToast('Véhicule ajouté à sauvegardé', 'success');
+    }
+    
+    // Dispatch custom event to notify other components (e.g., ClientSpace)
+    window.dispatchEvent(new Event('vehicleSaveChanged'));
   };
 
   const requestDelete = (id: string) => {
@@ -143,13 +236,11 @@ export const Vehicles = () => {
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-emerald-500 transition-colors" size={18} />
             <input
               type="text"
+              value={searchQuery}
+              onChange={(e) => performSearch(e.target.value)}
               placeholder="Rechercher par VIN, Marque ou Modèle..."
               className="w-full pl-14 pr-6 py-4 bg-zinc-900/40 border border-white/5 rounded-2xl outline-none focus:border-emerald-500/30 text-xs font-bold uppercase tracking-widest text-white transition-all"
             />
-          </div>
-          <div className="flex gap-4">
-            <Button variant="outline"><Filter size={18} /> Filtres</Button>
-            <Button variant="outline"><Camera size={18} /> Media Mode</Button>
           </div>
         </div>
 
@@ -161,13 +252,13 @@ export const Vehicles = () => {
                 <p className="mt-4 text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Synchronisation avec la Matrice...</p>
               </td>
             </tr>
-          ) : vehicles.length === 0 ? (
+          ) : filteredVehicles.length === 0 ? (
             <tr>
               <td colSpan={6} className="py-20 text-center text-zinc-500 italic">
-                Aucun véhicule disponible dans la base.
+                {searchQuery ? 'Aucun véhicule trouvé pour votre recherche.' : 'Aucun véhicule disponible dans la base.'}
               </td>
             </tr>
-          ) : vehicles.map(v => (
+          ) : filteredVehicles.map(v => (
             <tr key={v.id} className="group hover:bg-white/[0.02] transition-all">
               <td className="px-8 py-6">
                 <div className="flex items-center gap-5">
@@ -189,18 +280,14 @@ export const Vehicles = () => {
                   {analyzing === v.id ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
                   Check Marché
                 </button>
-                <div className="mt-2">
-                   <Protect roles={[UserRole.CLIENT]}>
-                       <Button variant="outline" className="w-full text-xs py-1 h-8" onClick={() => setSelectedVehicleForNeg(v)}>
-                           Contacter
-                       </Button>
-                   </Protect>
-                </div>
               </td>
               <td className="px-8 py-6">
                 <div className="space-y-1">
                   <p className="text-xs font-bold text-zinc-400">{v.mileage.toLocaleString()} KM</p>
                   <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">{v.fuelType}</p>
+                  <p className="text-[9px] font-bold text-emerald-400/80 uppercase tracking-widest mt-2">
+                    🏢 {v.agency?.name || 'Non assignée'}
+                  </p>
                 </div>
               </td>
               <td className="px-8 py-6">
@@ -210,12 +297,31 @@ export const Vehicles = () => {
                 <Badge variant={v.status === 'available' ? 'success' : 'warning'}>{v.status}</Badge>
               </td>
               <td className="px-8 py-6 text-right">
+                <Protect roles={[UserRole.CLIENT]}>
+                  <div className="flex items-center justify-end gap-2">
+                    <button 
+                      onClick={() => setSelectedVehicleForNeg(v)}
+                      className="px-4 py-2 text-emerald-400 hover:text-white bg-emerald-500/10 rounded-xl border border-emerald-500/20 hover:bg-emerald-500 transition-all text-[10px] font-bold uppercase tracking-widest"
+                    >
+                        Contacter
+                    </button>
+                    <button 
+                      onClick={() => toggleSaveVehicle(v.id)}
+                      className={`p-3 rounded-xl border transition-all ${
+                        savedVehicles.includes(v.id)
+                          ? 'bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30'
+                          : 'bg-zinc-950 text-zinc-600 border-white/5 hover:text-amber-400'
+                      }`}
+                      title={savedVehicles.includes(v.id) ? 'Retirer de ma sélection' : 'Ajouter à ma sélection'}
+                    >
+                        {savedVehicles.includes(v.id) ? <Trash2 size={16} /> : <Zap size={16} />}
+                    </button>
+                  </div>
+                </Protect>
                 <Protect roles={[UserRole.MANAGER, UserRole.ADMIN, UserRole.USER]}>
                   <div className="flex items-center justify-end gap-2">
                     <button 
-                      onClick={() => {
-                        window.location.hash = `/vehicles/${v.id}`;
-                      }}
+                      onClick={() => navigate(`/vehicles/${v.id}`)}
                       className="p-3 text-zinc-600 hover:text-white bg-zinc-950 rounded-xl border border-white/5"
                     >
                         <Eye size={16} />
@@ -277,7 +383,7 @@ export const Vehicles = () => {
             onClose={() => setSelectedVehicleForNeg(null)}
             vehicleId={selectedVehicleForNeg.id}
             vehicleName={`${selectedVehicleForNeg.brand} ${selectedVehicleForNeg.model}`}
-            agencyId={selectedVehicleForNeg.agencyId || '659c23a7e4b0a1d4f8e5c321'} // Fallback ID
+            agencyId={selectedVehicleForNeg.agency?.id || selectedVehicleForNeg.agencyId || '659c23a7e4b0a1d4f8e5c321'}
           />
       )}
 

@@ -2,6 +2,31 @@ const User = require('../models/User');
 const Client = require('../models/Client');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
+const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
+
+// Configure Cloudinary from .env
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// Configure multer for memory storage
+const storage = multer.memoryStorage();
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only images are allowed'), false);
+        }
+    }
+});
+
+exports.uploadMiddleware = upload.single('photo');
 
 exports.getMyProfile = catchAsync(async (req, res, next) => {
     // Current user profile
@@ -71,6 +96,52 @@ exports.updateConsents = catchAsync(async (req, res, next) => {
         status: 'success',
         data: { user }
     });
+});
+
+exports.updateMyProfilePhoto = catchAsync(async (req, res, next) => {
+    if (!req.file) {
+        return next(new AppError('Please upload a photo', 400));
+    }
+
+    try {
+        // Upload to Cloudinary
+        const result = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+                {
+                    folder: 'user_profiles',
+                    transformation: [
+                        { width: 256, height: 256, crop: 'fill', gravity: 'face' },
+                        { quality: 'auto' }
+                    ],
+                    timeout: 60000
+                },
+                (error, result) => {
+                    if (error) {
+                        console.error('Cloudinary upload error:', error);
+                        reject(error);
+                    } else {
+                        resolve(result);
+                    }
+                }
+            );
+            uploadStream.end(req.file.buffer);
+        });
+
+        // Update user photo
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            { photo: result.secure_url },
+            { new: true }
+        );
+
+        res.status(200).json({
+            status: 'success',
+            photo: result.secure_url
+        });
+    } catch (error) {
+        console.error('Photo upload error:', error);
+        return next(new AppError('Failed to upload photo', 500));
+    }
 });
 
 const filterObj = (obj, ...allowedFields) => {

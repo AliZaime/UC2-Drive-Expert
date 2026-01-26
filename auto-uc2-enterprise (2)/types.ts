@@ -17,6 +17,13 @@ export interface User {
   status: 'active' | 'inactive' | 'suspended';
   lastLogin: string;
   mfaEnabled: boolean;
+  createdAt?: string;
+  consents?: {
+    personalDataProcessing?: boolean;
+    registrationDataUsage?: boolean;
+    conversationDataUsage?: boolean;
+    updatedAt?: string;
+  };
 }
 
 export interface Vehicle {
@@ -31,6 +38,18 @@ export interface Vehicle {
   mileage: number;
   fuelType: string;
   agencyId: string;
+  agency?: {
+    id: string;
+    name: string;
+    address?: {
+      street?: string;
+      city?: string;
+      zip?: string;
+      country?: string;
+    };
+    phone?: string;
+    email?: string;
+  };
 }
 
 export interface Agency {
@@ -38,11 +57,13 @@ export interface Agency {
   name: string;
   location: string;
   address?: {
-    city: string;
-    country: string;
+    street?: string;
+    city?: string;
+    zip?: string;
+    country?: string;
   };
-  email?: string;
   phone?: string;
+  email?: string;
   revenue: string;
   fleetCount: number;
   managerId: string;

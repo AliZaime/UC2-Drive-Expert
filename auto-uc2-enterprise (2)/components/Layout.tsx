@@ -53,7 +53,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
           roles: [UserRole.CLIENT],
           children: [
             { label: 'Sauvegardés', path: '/client/saved', icon: Star },
-            { label: 'Recommandés', path: '/client/recommended', icon: Zap },
             { label: 'Parcourir tout', path: '/vehicles', icon: Search },
           ]
         },
@@ -61,11 +60,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
           icon: MessageSquare,
           label: 'Négociations',
           roles: [UserRole.CLIENT],
-          children: [
-            { label: 'En cours', path: '/negotiations', icon: Activity },
-            { label: 'Acceptées', path: '/client/deals/won', icon: ShieldCheck },
-            { label: 'Rejetées', path: '/client/deals/lost', icon: X },
-          ]
+          path: '/negotiations'
         },
         { icon: Calendar, label: 'Rendez-vous', path: '/client/appointments', roles: [UserRole.CLIENT] },
         { icon: FileText, label: 'Contrats', path: '/client/contracts', roles: [UserRole.CLIENT] },
@@ -89,8 +84,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
           roles: [UserRole.USER],
           children: [
             { label: 'Répertoire', path: '/clients' },
-            { label: 'Notes & Suivi', path: '/clients/activity' },
-            { label: 'Segmentation', path: '/clients/segments', icon: Target },
           ]
         },
         {
@@ -99,8 +92,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
           roles: [UserRole.USER],
           children: [
             { label: 'Active Chats', path: '/negotiations' },
-            { label: 'Offres en attente', path: '/deals/pending', icon: DollarSign },
-            { label: 'Clôturés', path: '/deals/closed', icon: ShieldCheck },
           ]
         },
         { icon: PieChart, label: 'Analytics', path: '/analytics', roles: [UserRole.USER] },
@@ -202,8 +193,14 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
                   return (
                     <div key={iIdx} className="space-y-1">
                       {hasChildren ? (
-                        <button
-                          onClick={() => toggleMenu(item.label)}
+                        <Link
+                          to={item.children[0].path}
+                          onClick={(e) => {
+                            if (isExpanded) {
+                              e.preventDefault();
+                              toggleMenu(item.label);
+                            }
+                          }}
                           className={cn(
                             "w-full flex items-center px-4 py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all",
                             isActive ? "text-white" : "text-zinc-500 hover:text-white hover:bg-white/5"
@@ -217,7 +214,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
                             {item.label}
                             {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                           </div>
-                        </button>
+                        </Link>
                       ) : (
                         <Link
                           to={item.path!}

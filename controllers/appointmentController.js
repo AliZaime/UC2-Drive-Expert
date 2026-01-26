@@ -51,11 +51,23 @@ exports.updateAppointment = catchAsync(async (req, res, next) => {
          return next(new AppError('Not your appointment', 403));
     }
 
-    // Only allow cancelling or rescheduling if pending
+    if (appointment.status !== 'pending') {
+        return next(new AppError('Only pending appointments can be modified', 400));
+    }
+
     if (req.body.status === 'cancelled') {
         appointment.status = 'cancelled';
+    } else {
+        if (req.body.date) {
+            appointment.date = req.body.date;
+        }
+        if (req.body.type) {
+            appointment.type = req.body.type;
+        }
+        if (typeof req.body.notes !== 'undefined') {
+            appointment.notes = req.body.notes;
+        }
     }
-    // Update date...
     
     await appointment.save();
 
