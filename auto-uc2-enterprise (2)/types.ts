@@ -37,6 +37,12 @@ export interface Agency {
   id: string;
   name: string;
   location: string;
+  address?: {
+    city: string;
+    country: string;
+  };
+  email?: string;
+  phone?: string;
   revenue: string;
   fleetCount: number;
   managerId: string;
