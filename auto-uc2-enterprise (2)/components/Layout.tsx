@@ -108,19 +108,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
             { label: 'Santé (Health)', path: '/admin/health' },
             { label: 'Métriques', path: '/admin/metrics' },
             { label: 'Logs Audit', path: '/admin/logs' },
-            { label: 'Configuration', path: '/admin/config' },
           ]
         },
         { icon: Users, label: 'Utilisateurs', path: '/admin/users', roles: [UserRole.SUPERADMIN, UserRole.ADMIN] },
         { icon: Building2, label: 'Réseau Agences', path: '/admin/agencies', roles: [UserRole.SUPERADMIN, UserRole.ADMIN] },
-        { icon: QrCode, label: 'Bornes Kiosks', path: '/admin/kiosks', roles: [UserRole.SUPERADMIN, UserRole.ADMIN] },
-      ]
-    },
-    {
-      title: "Cybersécurité",
-      items: [
-        { icon: ShieldAlert, label: 'War Room', path: '/admin/security', roles: [UserRole.SUPERADMIN] },
-        { icon: RefreshCcw, label: 'Data Recovery', path: '/admin/sync', roles: [UserRole.SUPERADMIN] },
       ]
     },
     {

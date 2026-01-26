@@ -1,33 +1,63 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, Badge, cn } from '../../components/UI';
+import { Card, Badge, cn, Modal, Button } from '../../components/UI';
 import {
   AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer
 } from 'recharts';
 import {
   Database, Server, Cpu, Globe, Zap, ShieldCheck,
-  AlertCircle, Activity, HardDrive, Network, Loader2
+  AlertCircle, Activity, HardDrive, Network, Loader2, Eye, ExternalLink
 } from 'lucide-react';
-import { MOCK_METRICS, MOCK_LOGS } from '../../constants';
+import { MOCK_METRICS } from '../../constants';
 import { api } from '../../api';
+import { Link } from 'react-router-dom';
 
 export const SystemHealth = () => {
   const [health, setHealth] = useState<any>(null);
+  const [logs, setLogs] = useState<any[]>([]);
+  const [selectedLog, setSelectedLog] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchHealth = async () => {
-      try {
-        const response = await api.get<any>('/admin/system/health');
-        setHealth(response);
-      } catch (err) {
-        console.error('Failed to fetch system health', err);
-      } finally {
-        setLoading(false);
+  const fetchData = async () => {
+    try {
+      const [healthRes, logsRes] = await Promise.all([
+        api.get<any>('/admin/system/health'),
+        api.get<any>('/admin/system/logs')
+      ]);
+      setHealth(healthRes);
+
+      if (logsRes.data && logsRes.data.logs) {
+        const parsedLogs = logsRes.data.logs.map((line: string, index: number) => {
+          const match = line.match(/^\[(.*?)\]\s+(\w+)\s+(.*?):\s+(.*)$/);
+          if (match) {
+            return {
+              id: `log-${index}`,
+              timestamp: match[1],
+              level: match[2].toLowerCase(),
+              source: match[3],
+              message: match[4]
+            };
+          }
+          return {
+            id: `log-${index}`,
+            timestamp: new Date().toISOString(),
+            level: 'info',
+            source: 'SYSTEM',
+            message: line
+          };
+        });
+        setLogs(parsedLogs.reverse().slice(0, 5));
       }
-    };
-    fetchHealth();
-    const interval = setInterval(fetchHealth, 30000);
+    } catch (err) {
+      console.error('Failed to fetch system data', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(fetchData, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -166,17 +196,20 @@ export const SystemHealth = () => {
             <h2 className="text-2xl font-black text-white tracking-tighter uppercase">Audit Stream</h2>
             <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mt-1">Active security events and system changes</p>
           </div>
-          <button className="text-[10px] font-black uppercase tracking-widest text-emerald-500 hover:text-emerald-400 transition-colors">View All Logs</button>
+          <Link to="/admin/logs" className="text-[10px] font-black uppercase tracking-widest text-emerald-500 hover:text-emerald-400 transition-colors flex items-center gap-2">
+            View All Logs <ExternalLink size={12} />
+          </Link>
         </div>
         <div className="space-y-4">
-          {MOCK_LOGS.map(log => (
+          {logs.length === 0 ? (
+            <p className="text-center py-10 text-zinc-600 italic uppercase text-[10px] tracking-widest font-black">Waiting for signal intelligence...</p>
+          ) : logs.map(log => (
             <div key={log.id} className="flex items-center gap-6 p-4 hover:bg-white/5 rounded-2xl transition-all group border border-transparent hover:border-white/5">
               <div className={cn(
                 "px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border",
-                log.level === 'critical' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
-                  log.level === 'error' ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' :
-                    log.level === 'warning' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
-                      'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'
+                log.level === 'critical' || log.level === 'error' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
+                  log.level === 'warning' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
+                    'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'
               )}>
                 {log.level}
               </div>
@@ -184,12 +217,53 @@ export const SystemHealth = () => {
               <div className="text-[10px] font-black uppercase tracking-widest text-emerald-500 w-32 shrink-0">{log.source}</div>
               <div className="text-xs font-bold text-zinc-300 flex-1 truncate">{log.message}</div>
               <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                <button className="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white">Details</button>
+                <button
+                  onClick={() => setSelectedLog(log)}
+                  className="px-4 py-2 bg-zinc-950 rounded-xl border border-white/5 text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition-all flex items-center gap-2"
+                >
+                  <Eye size={12} /> Details
+                </button>
               </div>
             </div>
           ))}
         </div>
       </div>
+
+      <Modal
+        isOpen={!!selectedLog}
+        onClose={() => setSelectedLog(null)}
+        title="Protocol Log Details"
+        footer={<Button variant="ghost" onClick={() => setSelectedLog(null)}>Close Entry</Button>}
+      >
+        {selectedLog && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 bg-zinc-950 rounded-2xl border border-white/5">
+                <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">Timestamp</p>
+                <p className="text-xs font-black text-white">{selectedLog.timestamp}</p>
+              </div>
+              <div className="p-4 bg-zinc-950 rounded-2xl border border-white/5">
+                <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">Severity Level</p>
+                <Badge variant={selectedLog.level === 'critical' || selectedLog.level === 'error' ? 'error' : selectedLog.level === 'warning' ? 'warning' : 'neutral'}>
+                  {selectedLog.level}
+                </Badge>
+              </div>
+            </div>
+
+            <div className="p-4 bg-zinc-950 rounded-2xl border border-white/5">
+              <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">Source Interface</p>
+              <p className="text-xs font-black text-emerald-500">{selectedLog.source}</p>
+            </div>
+
+            <div className="p-6 bg-zinc-950 rounded-2xl border border-white/5">
+              <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-3">Event Payload</p>
+              <p className="text-sm font-bold text-zinc-300 leading-relaxed font-mono bg-black/40 p-4 rounded-xl border border-white/5">
+                {selectedLog.message}
+              </p>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

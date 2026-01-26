@@ -16,6 +16,7 @@ import { SystemLogs } from './pages/admin/SystemLogs';
 import { SystemConfig } from './pages/admin/SystemConfig';
 import { UserManagement } from './pages/admin/UserManagement';
 import { AgencyManagement } from './pages/admin/AgencyManagement';
+import { AgencyDetails } from './pages/admin/AgencyDetails';
 import { SecurityAudit } from './pages/admin/SecurityAudit';
 import { SyncBackup } from './pages/admin/SyncBackup';
 import { KioskManagement } from './pages/admin/KioskManagement';
@@ -84,6 +85,7 @@ const AppContent: React.FC<{ user: User | null; onLogin: (u: User) => void; onLo
                       <Route path="/admin/config" element={<SystemConfig />} />
                       <Route path="/admin/users" element={<UserManagement />} />
                       <Route path="/admin/agencies" element={<AgencyManagement />} />
+                      <Route path="/admin/agencies/:id" element={<AgencyDetails />} />
                       <Route path="/admin/kiosks" element={<KioskManagement />} />
                     </>
                   )}
