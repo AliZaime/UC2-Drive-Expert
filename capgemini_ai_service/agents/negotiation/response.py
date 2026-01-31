@@ -3,6 +3,7 @@ import re
 from langchain_core.prompts import ChatPromptTemplate
 from schemas.models import EmotionalContextModel
 from .language import LanguageDetector
+from core.logger import logger
 
 class ResponseGenerator:
     """Handles prompt engineering and text generation - SIMPLIFIED VERSION"""

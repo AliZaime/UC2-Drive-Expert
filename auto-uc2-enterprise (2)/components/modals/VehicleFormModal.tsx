@@ -198,7 +198,7 @@ export const VehicleFormModal: React.FC<VehicleFormModalProps> = ({ isOpen, onCl
       });
 
       const token = localStorage.getItem('auto_uc2_token');
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/vehicles/${vehicleId}/photos`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/vehicles/${vehicleId}/photos`, {
          method: 'POST',
          headers: {
              'Authorization': `Bearer ${token}`

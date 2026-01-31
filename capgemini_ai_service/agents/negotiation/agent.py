@@ -10,6 +10,7 @@ from schemas.models import (
 from schemas.types import NegotiationIntent
 from core.session_store import get_session_store, NegotiationSession
 from core.metrics import WinWinCalculator
+from core.logger import logger
 
 # Import our new modules
 from .language import LanguageDetector

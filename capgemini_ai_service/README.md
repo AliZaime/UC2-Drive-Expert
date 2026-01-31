@@ -1,11 +1,14 @@
-# AI Service - Autonomous Negotiation Platform
-## Multi-Agent System with Emotional Intelligence & Explainable AI
+# 🤖 UC2 AI Core: The Negotiation Engine
+
+> **Multi-Agent Orchestration with Emotional Intelligence & Explainable AI (XAI)**
+> Dedicated AI Service for the **Capgemini Agentic AI Hackathon 🇲🇦**
 
 ---
 
 ## 🚀 Quick Start
 
 ### **Prerequisites**
+
 - Python 3.9+
 - Groq API Key ([get one here](https://console.groq.com))
 
@@ -66,11 +69,13 @@ ai-service/
 ## 🔌 API Endpoints
 
 ### **Health Check**
+
 ```http
 GET /health
 ```
 
 Response:
+
 ```json
 {
   "status": "healthy",
@@ -82,12 +87,14 @@ Response:
 
 ---
 
-### **Trade-In Valuation** 
+### **Trade-In Valuation**
+
 ```http
 POST /ai/valuation
 ```
 
 Request:
+
 ```json
 {
   "trade_in_id": "TRADE123",
@@ -105,11 +112,12 @@ Request:
 ```
 
 Response:
+
 ```json
 {
   "trade_in_id": "TRADE123",
   "estimated_value": 72000,
-  "value_range": {"min": 68000, "max": 78000},
+  "value_range": { "min": 68000, "max": 78000 },
   "breakdown": {
     "base_price": 70000,
     "adjustments": [
@@ -136,6 +144,7 @@ Response:
 ```
 
 **✨ Features:**
+
 - Explainable AI with step-by-step reasoning
 - Moroccan market data
 - Transparent pricing breakdown
@@ -144,18 +153,20 @@ Response:
 ---
 
 ### **Negotiation Turn**
+
 ```http
 POST /ai/negotiate
 ```
 
 Request:
+
 ```json
 {
   "session_id": "NEG123",
   "customer_message": "C'est trop cher, pouvez-vous faire 2,700 MAD?",
   "conversation_history": [
-    {"speaker": "agent", "message": "Je vous propose 2,900 MAD/mois"},
-    {"speaker": "customer", "message": "C'est trop cher..."}
+    { "speaker": "agent", "message": "Je vous propose 2,900 MAD/mois" },
+    { "speaker": "customer", "message": "C'est trop cher..." }
   ],
   "current_offer": {
     "monthly": 2900,
@@ -165,6 +176,7 @@ Request:
 ```
 
 Response:
+
 ```json
 {
   "session_id": "NEG123",
@@ -196,6 +208,7 @@ Response:
 ```
 
 **✨ Features:**
+
 - Emotional intelligence (detects frustration, worry, happiness, etc.)
 - Intent classification (counter-offer, accept, reject, etc.)
 - Adaptive negotiation strategy
@@ -207,25 +220,30 @@ Response:
 ## 🎯 Key Features
 
 ### **1. Explainable AI (Transparency)**
+
 Every decision includes:
+
 - Step-by-step reasoning
 - Confidence scores
 - Data sources
 - Adjustment breakdowns
 
 ### **2. Emotional Intelligence (Empathy)**
+
 - Emotion detection from customer messages
 - Adaptive tone and strategy
 - Concern identification
 - Empathetic response generation
 
 ### **3. Moroccan Market Specialization**
+
 - Local pricing data
 - Popular brands (Dacia, Renault, Peugeot)
 - MAD currency
 - French language
 
 ### **4. Win-Win Optimization**
+
 - Maintains dealer margins (8-12%)
 - Respects customer budgets
 - Transparent process
@@ -236,6 +254,7 @@ Every decision includes:
 ## 🧠 Agents
 
 ### **Valuation Agent**
+
 - Analyzes trade-in vehicles
 - Compares with market data
 - Calculates fair value
@@ -243,6 +262,7 @@ Every decision includes:
 - Provides confidence scores
 
 ### **Negotiation Agent**
+
 - Detects customer emotions
 - Classifies intent
 - Adapts strategy dynamically
@@ -295,9 +315,9 @@ The AI service is called by the Express backend:
 
 ```javascript
 // Backend calls AI service
-const response = await axios.post('http://localhost:8001/ai/valuation', {
+const response = await axios.post("http://localhost:8001/ai/valuation", {
   trade_in_id: tradeInId,
-  vehicle: vehicleData
+  vehicle: vehicleData,
 });
 
 const valuation = response.data;
