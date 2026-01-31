@@ -20,8 +20,6 @@ By leveraging **Multi-Agent Systems (MAS)**, **Emotional Intelligence**, and **E
 
 ---
 
----
-
 ## 🏗️ Architecture & Stack Technologique
 
 Le projet suit une architecture **MVC (Model-View-Controller)** stricte et modulaire.
@@ -93,40 +91,72 @@ Le système implémente **6 niveaux de rôles** avec des permissions granulaires
 
 ## 📦 Catalogue des Services
 
-L'application est divisée en micro-modules logiques. Voici ce que vous pouvez faire :
+L'application est divisée en micro-modules logiques :
 
 ### 1. 🛡️ Authentification & Security Core
 
-_Gestion des identités et de la sécurité._
-
-- **Auth** : `POST /register`, `/login`, `/logout`, `/refresh`.
-- **MFA (2FA)** : Protection via authentificateur (Google Auth) pour les comptes sensibles.
-- **Impersonation** : (`/admin/users/:id/impersonate`) Permet aux admins de se connecter "en tant que" client pour le support.
-- **Privacy & GDPR** : (`PUT /my/consents`) Gestion fine des autorisations (Marketing, Data).
+- **MFA (2FA)** : Protection via Google Authenticator.
+- **Impersonation** : Support client via connexion "as user".
+- **GDPR Compliance** : Gestion fine des consentements data.
 
 ### 2. 🚛 Commercial & Fleet Management
 
-_Cœur métier pour les Commerciaux et Managers._
+- **Smart Inventory** : CRUD avec upload Cloudinary.
+- **AI-Managed Negotiations** : Interface de suivi des agents.
+- **Real-Time KPIs** : Dashboard de pilotage agence.
 
-- **Vehicles** : CRUD complet des véhicules. Upload photos via Cloudinary.
-- **Negotiations** : Moteur de négociation (Offre -> Contre-offre -> Acceptation).
-- **Client CRM** : Gestion des profils clients, notes et historique.
-- **Dashboard** : KPIs temps réel pour le pilotage.
+### 3. 👤 Client Experience
 
-### 3. 👤 Client Experience (End-User)
+- **Dynamic Appointments** : Prise de RDV simplifiée.
+- **Geo-Search** : Recherche d'agences par rayon (GeoJSON).
+- **Hybrid Notifications** : Système WebSocket + Persistence.
 
-_Services destinés à l'application mobile/web client._
+---
 
-- **Appointments** : (`/my/appointments`) Prise de rendez-vous (Essai, Livraison).
-- **Geolocation** : (`/public/agencies-within/...`) Recherche d'agences Sogetrel par rayon (GeoJSON).
-- **Notifications** : Système hybride (Push WebSocket + Historique Pull).
+---
 
-### 4. 📄 Documents & Contrats
+## 📽️ Démonstration Vidéo
 
-_Légalisation des accords._
+> [!IMPORTANT]
+> **[Regarder la vidéo de démonstration sur Google Drive](https://drive.google.com/file/d/10WszXMgOoAOt4T7f_KPnEjlyE4EoNEgI/view?usp=sharing)**
 
-- **PDF Generator** : (`/contracts/generate`) Création automatique de contrats au design "Drive Expert".
-- **E-Signature** : (`/contracts/:id/sign`) Signature numérique avec horodatage et IP.
+---
+
+## 🧠 Architecture Agentique (Multi-Agent System)
+
+UC2 n'est pas un simple chatbot, c'est un **système de 6 agents coordonnés** par un orchestrateur d'état (**LangGraph**) pour garantir une autonomie contrôlée et une expertise métier.
+
+### ⛓️ L'Orchestrateur (The Brain)
+
+Basé sur **LangGraph**, l'orchestrateur gère le flux de décision complexe :
+
+1.  **Profilage** -> Analyse des besoins et psychographie du client.
+2.  **Valuation** -> Évaluation dynamique de la reprise du véhicule.
+3.  **Inventory Matching** -> Sélection intelligente dans le catalogue.
+4.  **Deal Structuring** -> Création d'offres de financement optimisées.
+5.  **Negotiation Loop** -> Dialogue interactif avec boucles de feedback.
+
+### 🤖 Les 6 Agents Spécialisés
+
+| Agent               | Rôle & Expertise                                        | Technologies                   |
+| :------------------ | :------------------------------------------------------ | :----------------------------- |
+| **Profilage**       | Détermine les besoins réels et le segment du client.    | LLM Analysis + Psychometrics   |
+| **Valuation**       | Évaluation précise (XAI) basée sur l'état et le marché. | Market Pricing Service + XAI   |
+| **Inventory**       | Match le stock réel avec les contraintes budgétaires.   | Vector Search / Filter Logic   |
+| **Deal Agent**      | Structure le crédit, la LLD et les mensualités.         | Financial Amortization Logic   |
+| **Negotiation**     | Le cerveau conversationnel (Darija, Émotion, Tactique). | Strategic Concession Engine    |
+| **Ethics Guardian** | Protège contre les injections et garantit les marges.   | Prompt Shielding + Margin Caps |
+
+---
+
+## 🇲🇦 Innovation : Support Local & Darija
+
+L'un des piliers de UC2 est sa capacité à comprendre et interagir naturellement avec le marché marocain :
+
+- **Reasoning-Based Language Detection** : Détecte le pattern linguistique marocain (Darija, Arabizi) sans passer par une traduction lourde.
+- **Empathie Contextuelle** : L'IA ajuste son ton si le client exprime des contraintes budgétaires liées à la famille ou au travail.
+
+---
 
 ---
 
