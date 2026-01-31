@@ -20,12 +20,11 @@ import { MOCK_VEHICLES } from '../constants';
 export const Vehicles = () => {
   const { addToast } = useToast();
   const navigate = useNavigate();
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [filteredVehicles, setFilteredVehicles] = useState<Vehicle[]>([]);
-  const [savedVehicles, setSavedVehicles] = useState<string[]>(() => {
-    const saved = localStorage.getItem('saved_vehicles');
-    return saved ? JSON.parse(saved) : [];
-  });
+
+  const [savedVehicles, setSavedVehicles] = useState<string[]>([]);
+  
+  const [vehicles, setVehicles] = useState<any[]>([]);
+  const [filteredVehicles, setFilteredVehicles] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchLoading, setSearchLoading] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -40,7 +39,6 @@ export const Vehicles = () => {
     vehicleId: null
   });
 
-  // Debounce timer for search
   const searchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const fetchVehicles = async () => {
@@ -52,7 +50,7 @@ export const Vehicles = () => {
       const normalized = data.map((v: any) => ({
         ...v,
         id: v._id || v.id,
-        brand: v.make || v.brand,
+        make: v.make || v.brand,
         image: v.images?.[0] || v.image || 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80',
         agencyId: v.agency?._id || v.agency?.id || v.agencyId,
         agency: typeof v.agency === 'object' ? {
@@ -72,22 +70,19 @@ export const Vehicles = () => {
     }
   };
 
-  const performSearch = async (query: string) => {
+  const performSearch = (query: string) => {
     setSearchQuery(query);
     
-    // Clear previous timeout
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
     }
     
-    // If query is empty, show all vehicles
     if (!query || !query.trim()) {
       setFilteredVehicles(vehicles);
       setSearchLoading(false);
       return;
     }
 
-    // Debounce search API call
     setSearchLoading(true);
     searchTimeoutRef.current = setTimeout(async () => {
       try {
@@ -98,48 +93,42 @@ export const Vehicles = () => {
           return;
         }
 
-        const response = await api.get<any>('/vehicles/search', {
-          params: { query: trimmedQuery }
-        });
-        const data = response.data.data ? response.data.data.vehicles : (response.data.vehicles || []);
-
-        const normalized = data.map((v: any) => ({
-          ...v,
-          id: v._id || v.id,
-          brand: v.make || v.brand,
-          image: v.images?.[0] || v.image || 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80',
-          agencyId: v.agency?._id || v.agency?.id || v.agencyId,
-          agency: typeof v.agency === 'object' ? {
-            id: v.agency._id || v.agency.id,
-            name: v.agency.name,
-            address: v.agency.address,
-            phone: v.agency.phone,
-            email: v.agency.email
-          } : v.agency
-        }));
-        setFilteredVehicles(normalized);
+        // Client-side filtering for immediate feedback, or API call could also work
+        const filtered = vehicles.filter(v => 
+            (v.make?.toLowerCase().includes(trimmedQuery.toLowerCase()) || 
+             v.model.toLowerCase().includes(trimmedQuery.toLowerCase()) ||
+             v.id.toLowerCase().includes(trimmedQuery.toLowerCase()))
+        );
+        setFilteredVehicles(filtered);
       } catch (err) {
         console.error('Search failed', err);
         addToast('Erreur lors de la recherche', 'error');
       } finally {
         setSearchLoading(false);
       }
-    }, 300); // Wait 300ms after user stops typing
+    }, 300);
+  };
+
+  const fetchSavedVehicles = async () => {
+    try {
+      const response = await api.get<any>('/my/vehicles/saved');
+      const vehicles = response.data.data ? response.data.data.vehicles : (response.data.vehicles || []);
+      setSavedVehicles(vehicles.map((v: any) => v._id || v.id));
+    } catch (err) {
+      console.error('Failed to fetch saved vehicles', err);
+    }
   };
 
   useEffect(() => {
     fetchVehicles();
+    fetchSavedVehicles();
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem('saved_vehicles', JSON.stringify(savedVehicles));
-  }, [savedVehicles]);
 
   const performMarketAnalysis = async (vehicle: any) => {
     setAnalyzing(vehicle.id);
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const prompt = `Analyse la valeur de marché pour une ${vehicle.brand} ${vehicle.model} de ${vehicle.year}. Notre prix est de ${vehicle.price}€. Est-ce compétitif ? Donne 3 points clés.`;
+      const prompt = `Analyse la valeur de marché pour une ${vehicle.make} ${vehicle.model} de ${vehicle.year}. Notre prix est de ${vehicle.price} MAD. Est-ce compétitif ? Donne 3 points clés.`;
 
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
@@ -158,13 +147,19 @@ export const Vehicles = () => {
     }
   };
 
-  const toggleSaveVehicle = (vehicleId: string) => {
-    if (savedVehicles.includes(vehicleId)) {
-      setSavedVehicles(savedVehicles.filter(id => id !== vehicleId));
-      addToast('Véhicule retiré de sauvegardé', 'success');
-    } else {
-      setSavedVehicles([...savedVehicles, vehicleId]);
-      addToast('Véhicule ajouté à sauvegardé', 'success');
+  const toggleSaveVehicle = async (vehicleId: string) => {
+    try {
+        const response = await api.post(`/my/vehicles/${vehicleId}/save`);
+        const action = response.data.action; // 'added' or 'removed'
+        
+        if (action === 'removed') {
+             addToast('Véhicule retiré de sauvegardé', 'success');
+        } else {
+             addToast('Véhicule ajouté à sauvegardé', 'success');
+        }
+        await fetchSavedVehicles();
+    } catch (err) {
+        addToast('Erreur lors de la sauvegarde', 'error');
     }
     
     // Dispatch custom event to notify other components (e.g., ClientSpace)
@@ -215,7 +210,7 @@ export const Vehicles = () => {
             <div className="p-3 bg-emerald-500/20 rounded-2xl text-emerald-500"><TrendingUp size={20} /></div>
             <div>
               <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Valeur Stock</p>
-              <p className="text-xl font-black text-white">4.2M €</p>
+              <p className="text-xl font-black text-white">4.2M MAD</p>
             </div>
           </div>
         </Card>
@@ -266,7 +261,7 @@ export const Vehicles = () => {
                     <img src={v.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={v.model} />
                   </div>
                   <div>
-                    <p className="font-black text-white text-sm tracking-tight">{v.brand} {v.model}</p>
+                    <p className="font-black text-white text-sm tracking-tight">{v.make} {v.model}</p>
                     <p className="text-[10px] font-bold text-zinc-600 tracking-widest uppercase">{v.year} • ID: {v.id}</p>
                   </div>
                 </div>
@@ -291,10 +286,10 @@ export const Vehicles = () => {
                 </div>
               </td>
               <td className="px-8 py-6">
-                <p className="text-lg font-black text-white tracking-tighter">{v.price.toLocaleString()}€</p>
+                <p className="text-lg font-black text-white tracking-tighter">{v.price.toLocaleString()} MAD</p>
               </td>
               <td className="px-8 py-6">
-                <Badge variant={v.status === 'available' ? 'success' : 'warning'}>{v.status}</Badge>
+                <Badge variant={(v.status === 'Available' || v.status === 'Disponible') ? 'success' : 'warning'}>{v.status}</Badge>
               </td>
               <td className="px-8 py-6 text-right">
                 <Protect roles={[UserRole.CLIENT]}>
@@ -382,7 +377,7 @@ export const Vehicles = () => {
             isOpen={!!selectedVehicleForNeg}
             onClose={() => setSelectedVehicleForNeg(null)}
             vehicleId={selectedVehicleForNeg.id}
-            vehicleName={`${selectedVehicleForNeg.brand} ${selectedVehicleForNeg.model}`}
+            vehicleName={`${selectedVehicleForNeg.make} ${selectedVehicleForNeg.model}`}
             agencyId={selectedVehicleForNeg.agency?.id || selectedVehicleForNeg.agencyId || '659c23a7e4b0a1d4f8e5c321'}
           />
       )}

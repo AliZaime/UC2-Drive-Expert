@@ -1,0 +1,11 @@
+{
+  "session_id": "test-new-456",
+  "customer_id": "cust-002", 
+  "customer_message": "C'est un peu cher, vous pouvez faire un effort sur le prix?",
+  "current_offer": {
+    "monthly": 6410,
+    "duration": 60,
+    "vehicle_id": "suv-001",
+    "vehicle_price": 300000
+  }
+}

@@ -40,8 +40,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
     {
       title: "Navigation",
       items: [
-        { icon: LayoutDashboard, label: 'Tableau de bord', path: '/dashboard', roles: [UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.USER, UserRole.CLIENT] },
-        { icon: Star, label: 'Accueil Public', path: '/', roles: [UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.USER, UserRole.CLIENT] },
+        { icon: LayoutDashboard, label: 'Tableau de bord', path: '/dashboard', roles: [UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.MANAGER, UserRole.USER, UserRole.CLIENT] },
+        { icon: Star, label: 'Accueil Public', path: '/', roles: [UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.MANAGER, UserRole.USER, UserRole.CLIENT] },
       ]
     },
     {
@@ -72,7 +72,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
         {
           icon: Car,
           label: 'Flotte UC2',
-          roles: [UserRole.USER],
+          roles: [UserRole.USER, UserRole.MANAGER],
           children: [
             { label: 'Inventaire complet', path: '/vehicles' },
             { label: 'Maintenance', path: '/fleet/service', icon: Sliders },
@@ -81,7 +81,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
         {
           icon: Users,
           label: 'Clients CRM',
-          roles: [UserRole.USER],
+          roles: [UserRole.USER, UserRole.MANAGER],
           children: [
             { label: 'Répertoire', path: '/clients' },
           ]
@@ -89,12 +89,13 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
         {
           icon: MessageSquare,
           label: 'Deals & Pipeline',
-          roles: [UserRole.USER],
+          roles: [UserRole.USER, UserRole.MANAGER],
           children: [
             { label: 'Active Chats', path: '/negotiations' },
           ]
         },
-        { icon: PieChart, label: 'Analytics', path: '/analytics', roles: [UserRole.USER] },
+        { icon: PieChart, label: 'Analytics', path: '/analytics', roles: [UserRole.USER, UserRole.MANAGER] },
+        { icon: Users, label: 'Mon Équipe', path: '/my-team', roles: [UserRole.MANAGER] },
       ]
     },
     {
@@ -103,7 +104,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
         {
           icon: Activity,
           label: 'Système',
-          roles: [UserRole.SUPERADMIN, UserRole.ADMIN],
+          roles: [UserRole.SUPERADMIN],
           children: [
             { label: 'Santé (Health)', path: '/admin/health' },
             { label: 'Métriques', path: '/admin/metrics' },
@@ -123,8 +124,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
           roles: [UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.USER, UserRole.CLIENT],
           children: [
             { label: 'Gérer Profil', path: '/profile' },
-            { label: 'Sécurité MFA', path: '/profile/security', icon: ShieldCheck },
-            { label: 'Confidentialité', path: '/profile/gdpr', icon: FileText },
           ]
         },
       ]

@@ -1,0 +1,11 @@
+{
+    "session_id": "test_natural_flow_1",
+    "customer_message": "Bonjour, je cherche une voiture pour ma famille.",
+    "customer_id": "test_user",
+    "vehicle_context": {
+        "vehicle_id": "1",
+        "price": 250000,
+        "make": "Dacia",
+        "model": "Jogger"
+    }
+}

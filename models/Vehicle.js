@@ -65,22 +65,42 @@ const vehicleSchema = new mongoose.Schema({
         ref: 'User'
     },
     
-    images: [String],
-    
-    features: [String],
-    
-    condition: {
-        type: String,
-        enum: ['New', 'Excellent', 'Good', 'Fair', 'Poor'],
-        default: 'Good'
+    // Simplified Schema to match detailed user JSON
+    costPrice: Number,
+
+    specifications: {
+        fuelType: String,
+        transmission: String,
+        color: String,
+        doors: Number,
+        seats: Number,
+        engineSize: String,
+        horsePower: Number
     },
     
-    description: String,
+    inventory: {
+        location: String,
+        daysInStock: Number
+    },
+
+    // Optional Images
+    images: {
+        type: [String],
+        default: [],
+        required: false
+    },
     
-    // For reserved/sold
-    buyer: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Client'
+    // Explicitly define Condition as string to accept French values "Neuf", "Très bon", etc. 
+    // Or keep enum? User provided French values.
+    // If we keep strict enum ['New', 'Good'...] we must map. 
+    // User asked "re work model... to take THIS". implying we should support "Neuf" etc?
+    // Let's relax the validation to allow strings or update enum if we want to support both.
+    // Ideally we map, but for simplicity let's allow string first.
+    condition: String, 
+    
+    status: {
+        type: String,
+        default: 'Disponible'
     }
 
 }, {

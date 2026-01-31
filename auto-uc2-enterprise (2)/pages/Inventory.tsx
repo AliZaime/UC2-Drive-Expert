@@ -14,7 +14,7 @@ export const Inventory: React.FC = () => {
     try {
       // Use process.env.API_KEY directly for initialization
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const prompt = `Research the current market value for a ${vehicle.year} ${vehicle.brand} ${vehicle.model}. Compare it to our listing price of $${vehicle.price}. Is our price competitive? Provide a brief summary and mention current trends.`;
+      const prompt = `Research the current market value for a ${vehicle.year} ${vehicle.make} ${vehicle.model}. Compare it to our listing price of $${vehicle.price}. Is our price competitive? Provide a brief summary and mention current trends.`;
       
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
@@ -75,10 +75,10 @@ export const Inventory: React.FC = () => {
               <td className="px-4 py-4">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-8 rounded-md overflow-hidden bg-zinc-100">
-                    <img src={v.image} className="w-full h-full object-cover" alt={v.model} />
+                    <img src={v.images?.[0] || v.image || 'https://images.unsplash.com/photo-1503376780353-7e6692767b70'} className="w-full h-full object-cover" alt={v.model} />
                   </div>
                   <div>
-                    <p className="font-bold text-zinc-900 text-sm">{v.brand} {v.model}</p>
+                    <p className="font-bold text-zinc-900 text-sm">{v.make} {v.model}</p>
                     <p className="text-xs text-zinc-400 font-medium">{v.year}</p>
                   </div>
                 </div>
@@ -100,7 +100,7 @@ export const Inventory: React.FC = () => {
               <td className="px-4 py-4 text-sm text-zinc-600 font-semibold">{v.mileage.toLocaleString()} km</td>
               <td className="px-4 py-4 text-sm font-black text-zinc-900">${v.price.toLocaleString()}</td>
               <td className="px-4 py-4">
-                <Badge variant={v.status === 'available' ? 'success' : v.status === 'sold' ? 'error' : 'warning'}>
+                <Badge variant={(v.status === 'Available' || v.status === 'Disponible') ? 'success' : v.status === 'Sold' ? 'error' : 'warning'}>
                   {v.status}
                 </Badge>
               </td>

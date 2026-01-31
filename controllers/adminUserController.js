@@ -10,7 +10,12 @@ const signToken = id => {
 };
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
-    const users = await User.find();
+    let filter = {};
+    if (req.user.role === 'admin') {
+        filter = { role: { $ne: 'superadmin' } };
+    }
+
+    const users = await User.find(filter);
     
     res.status(200).json({
         status: 'success',

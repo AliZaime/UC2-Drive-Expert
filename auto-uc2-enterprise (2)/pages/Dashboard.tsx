@@ -74,7 +74,7 @@ export const Dashboard = () => {
   }));
 
   const kpiData = [
-    { label: 'Revenue Forecast', value: `${(analytics.revenue.reduce((acc: number, curr: any) => acc + curr.totalRevenue, 0)).toLocaleString()}€`, icon: DollarSign, trend: '+12%', color: 'text-emerald-500', bg: 'bg-emerald-500/5' },
+    { label: 'Revenue Forecast', value: `${(analytics.revenue.reduce((acc: number, curr: any) => acc + curr.totalRevenue, 0)).toLocaleString()} MAD`, icon: DollarSign, trend: '+12%', color: 'text-emerald-500', bg: 'bg-emerald-500/5' },
     { label: 'Fleet Units', value: stats.inventory || 24, icon: Car, trend: '+4', color: 'text-blue-500', bg: 'bg-blue-500/5' },
     { label: 'Active Deals', value: stats.activeNegotiations || 5, icon: MessageSquare, trend: 'LIVE', color: 'text-purple-500', bg: 'bg-purple-500/5' },
     { label: 'Client Base', value: stats.activeClients || 12, icon: Activity, trend: '+0.4%', color: 'text-cyan-500', bg: 'bg-cyan-500/5' },
@@ -268,7 +268,7 @@ export const Dashboard = () => {
           ) : vehicles.map((v: any) => (
             <div key={v.id || v._id} className="bg-zinc-900/40 border border-white/5 rounded-[2.5rem] overflow-hidden group cursor-pointer hover:border-emerald-500/30 transition-all duration-500 relative shadow-2xl hover:shadow-[0_0_50px_rgba(16,185,129,0.1)]">
               <div className="absolute top-5 right-5 z-10">
-                <Badge variant={v.status === 'available' ? 'success' : 'warning'} className="uppercase tracking-widest text-[8px] font-black backdrop-blur-md shadow-xl">{v.status}</Badge>
+                <Badge variant={(v.status === 'Available' || v.status === 'Disponible') ? 'success' : 'warning'} className="uppercase tracking-widest text-[8px] font-black backdrop-blur-md shadow-xl">{v.status}</Badge>
               </div>
               <div className="relative aspect-[4/3] overflow-hidden">
                 <img src={v.images?.[0] || 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80'} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1" alt={v.model} />
@@ -280,7 +280,7 @@ export const Dashboard = () => {
               </div>
               <div className="p-6 pt-2">
                 <div className="flex items-center justify-between border-t border-white/5 pt-4 group-hover:border-emerald-500/20 transition-colors">
-                  <p className="text-lg font-black text-white">{v.price?.toLocaleString()}€</p>
+                  <p className="text-lg font-black text-white">{v.price?.toLocaleString()} MAD</p>
                   <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">{v.year}</p>
                 </div>
               </div>

@@ -1,0 +1,503 @@
+[
+    {
+        "id": "1",
+        "make": "Dacia",
+        "model": "Jogger",
+        "year": 2024,
+        "mileage": 1500,
+        "condition": "Neuf",
+        "price": 220000,
+        "costPrice": 195000,
+        "status": "Disponible",
+        "specifications": {
+            "fuelType": "Essence",
+            "transmission": "Manuelle",
+            "color": "Gris Titanium",
+            "doors": 5,
+            "seats": 7,
+            "engineSize": "1.0L TCe",
+            "horsePower": 110
+        },
+        "features": [
+            "Climatisation",
+            "Système multimédia 8\"",
+            "Bluetooth",
+            "Régulateur de vitesse",
+            "ESP",
+            "ABS",
+            "7 places modulables"
+        ],
+        "images": [
+            "https://example.com/jogger1.jpg"
+        ],
+        "inventory": {
+            "location": "Casablanca - Showroom Principal",
+            "daysInStock": 15
+        }
+    },
+    {
+        "id": "2",
+        "make": "Dacia",
+        "model": "Sandero",
+        "year": 2023,
+        "mileage": 8500,
+        "condition": "Excellent",
+        "price": 145000,
+        "costPrice": 128000,
+        "status": "Disponible",
+        "specifications": {
+            "fuelType": "Essence",
+            "transmission": "Manuelle",
+            "color": "Blanc Glacier",
+            "doors": 5,
+            "seats": 5,
+            "engineSize": "0.9L TCe",
+            "horsePower": 90
+        },
+        "features": [
+            "Climatisation",
+            "Direction assistée",
+            "Lève-vitres électriques",
+            "Radio MP3",
+            "ABS"
+        ],
+        "images": [],
+        "inventory": {
+            "location": "Rabat - Concession",
+            "daysInStock": 22
+        }
+    },
+    {
+        "id": "3",
+        "make": "Renault",
+        "model": "Kangoo",
+        "year": 2023,
+        "mileage": 12000,
+        "condition": "Très bon",
+        "price": 195000,
+        "costPrice": 172000,
+        "status": "Disponible",
+        "specifications": {
+            "fuelType": "Diesel",
+            "transmission": "Manuelle",
+            "color": "Noir Intense",
+            "doors": 5,
+            "seats": 7,
+            "engineSize": "1.5L dCi",
+            "horsePower": 95
+        },
+        "features": [
+            "Climatisation automatique",
+            "GPS intégré",
+            "Caméra de recul",
+            "Sièges modulables",
+            "ESP",
+            "Régulateur de vitesse"
+        ],
+        "images": [],
+        "inventory": {
+            "location": "Casablanca - Showroom Principal",
+            "daysInStock": 8
+        }
+    },
+    {
+        "id": "4",
+        "make": "Peugeot",
+        "model": "Rifter",
+        "year": 2024,
+        "mileage": 500,
+        "condition": "Neuf",
+        "price": 235000,
+        "costPrice": 208000,
+        "status": "Disponible",
+        "specifications": {
+            "fuelType": "Diesel",
+            "transmission": "Automatique",
+            "color": "Bleu Vertigo",
+            "doors": 5,
+            "seats": 7,
+            "engineSize": "1.5L BlueHDi",
+            "horsePower": 130
+        },
+        "features": [
+            "Climatisation bi-zone",
+            "GPS 3D",
+            "Caméra 360°",
+            "Sièges chauffants",
+            "Vitres électriques arrière",
+            "Régulateur adaptatif",
+            "Assistant parking"
+        ],
+        "images": [],
+        "inventory": {
+            "location": "Casablanca - Showroom Principal",
+            "daysInStock": 5
+        }
+    },
+    {
+        "id": "5",
+        "make": "Dacia",
+        "model": "Duster",
+        "year": 2023,
+        "mileage": 15000,
+        "condition": "Très bon",
+        "price": 185000,
+        "costPrice": 163000,
+        "status": "Disponible",
+        "specifications": {
+            "fuelType": "Essence",
+            "transmission": "Manuelle",
+            "color": "Beige Sahara",
+            "doors": 5,
+            "seats": 5,
+            "engineSize": "1.3L TCe",
+            "horsePower": 130
+        },
+        "features": [
+            "Climatisation",
+            "GPS multimédia",
+            "4x2",
+            "Bluetooth",
+            "Régulateur de vitesse",
+            "Barres de toit"
+        ],
+        "images": [],
+        "inventory": {
+            "location": "Marrakech - Concession",
+            "daysInStock": 18
+        }
+    },
+    {
+        "id": "6",
+        "make": "Renault",
+        "model": "Clio",
+        "year": 2022,
+        "mileage": 32000,
+        "condition": "Bon",
+        "price": 125000,
+        "costPrice": 110000,
+        "status": "Disponible",
+        "specifications": {
+            "fuelType": "Essence",
+            "transmission": "Manuelle",
+            "color": "Rouge Flamme",
+            "doors": 5,
+            "seats": 5,
+            "engineSize": "1.0L SCe",
+            "horsePower": 75
+        },
+        "features": [
+            "Climatisation",
+            "Radio Bluetooth",
+            "Lève-vitres électriques",
+            "Direction assistée",
+            "ABS + ESP"
+        ],
+        "images": [],
+        "inventory": {
+            "location": "Casablanca - Occasion",
+            "daysInStock": 42
+        }
+    },
+    {
+        "id": "7",
+        "make": "Peugeot",
+        "model": "208",
+        "year": 2023,
+        "mileage": 18000,
+        "condition": "Très bon",
+        "price": 155000,
+        "costPrice": 137000,
+        "status": "Disponible",
+        "specifications": {
+            "fuelType": "Essence",
+            "transmission": "Automatique",
+            "color": "Gris Artense",
+            "doors": 5,
+            "seats": 5,
+            "engineSize": "1.2L PureTech",
+            "horsePower": 100
+        },
+        "features": [
+            "Climatisation automatique",
+            "GPS tactile",
+            "Caméra de recul",
+            "Radars de stationnement",
+            "i-Cockpit Peugeot",
+            "Apple CarPlay"
+        ],
+        "images": [],
+        "inventory": {
+            "location": "Rabat - Concession",
+            "daysInStock": 12
+        }
+    },
+    {
+        "id": "8",
+        "make": "Dacia",
+        "model": "Logan",
+        "year": 2022,
+        "mileage": 45000,
+        "condition": "Bon",
+        "price": 95000,
+        "costPrice": 84000,
+        "status": "Disponible",
+        "specifications": {
+            "fuelType": "Diesel",
+            "transmission": "Manuelle",
+            "color": "Blanc Glacier",
+            "doors": 4,
+            "seats": 5,
+            "engineSize": "1.5L dCi",
+            "horsePower": 90
+        },
+        "features": [
+            "Climatisation",
+            "Direction assistée",
+            "ABS",
+            "Vitres électriques avant"
+        ],
+        "images": [],
+        "inventory": {
+            "location": "Fès - Concession",
+            "daysInStock": 55
+        }
+    },
+    {
+        "id": "9",
+        "make": "Renault",
+        "model": "Captur",
+        "year": 2024,
+        "mileage": 3000,
+        "condition": "Neuf",
+        "price": 210000,
+        "costPrice": 186000,
+        "status": "Disponible",
+        "specifications": {
+            "fuelType": "Hybride",
+            "transmission": "Automatique",
+            "color": "Orange Valencia",
+            "doors": 5,
+            "seats": 5,
+            "engineSize": "1.6L E-Tech",
+            "horsePower": 145
+        },
+        "features": [
+            "Climatisation bi-zone",
+            "GPS EASY LINK",
+            "Caméra 360°",
+            "Sièges chauffants",
+            "Mode 100% électrique",
+            "Régulateur adaptatif",
+            "Détection angles morts"
+        ],
+        "images": [],
+        "inventory": {
+            "location": "Casablanca - Showroom Principal",
+            "daysInStock": 7
+        }
+    },
+    {
+        "id": "10",
+        "make": "Peugeot",
+        "model": "2008",
+        "year": 2023,
+        "mileage": 22000,
+        "condition": "Très bon",
+        "price": 185000,
+        "costPrice": 163000,
+        "status": "Disponible",
+        "specifications": {
+            "fuelType": "Essence",
+            "transmission": "Automatique",
+            "color": "Noir Perla Nera",
+            "doors": 5,
+            "seats": 5,
+            "engineSize": "1.2L PureTech",
+            "horsePower": 130
+        },
+        "features": [
+            "Climatisation automatique",
+            "GPS 3D connecté",
+            "Caméra de recul",
+            "i-Cockpit 3D",
+            "Grip Control",
+            "Détection de fatigue",
+            "Apple CarPlay / Android Auto"
+        ],
+        "images": [],
+        "inventory": {
+            "location": "Tanger - Concession",
+            "daysInStock": 16
+        }
+    },
+    {
+        "id": "11",
+        "make": "Dacia",
+        "model": "Spring Electric",
+        "year": 2024,
+        "mileage": 800,
+        "condition": "Neuf",
+        "price": 165000,
+        "costPrice": 146000,
+        "status": "Disponible",
+        "specifications": {
+            "fuelType": "Électrique",
+            "transmission": "Automatique",
+            "color": "Blanc Kaolin",
+            "doors": 5,
+            "seats": 4,
+            "engineSize": "Électrique 44 kW",
+            "horsePower": 65
+        },
+        "features": [
+            "Climatisation",
+            "Multimédia 7\"",
+            "Autonomie 230 km",
+            "Charge rapide",
+            "Mode ECO",
+            "Caméra de recul"
+        ],
+        "images": [],
+        "inventory": {
+            "location": "Casablanca - Showroom Principal",
+            "daysInStock": 10
+        }
+    },
+    {
+        "id": "12",
+        "make": "Renault",
+        "model": "Talisman",
+        "year": 2021,
+        "mileage": 58000,
+        "condition": "Bon",
+        "price": 175000,
+        "costPrice": 154000,
+        "status": "Disponible",
+        "specifications": {
+            "fuelType": "Diesel",
+            "transmission": "Automatique",
+            "color": "Gris Titanium",
+            "doors": 5,
+            "seats": 5,
+            "engineSize": "1.6L dCi",
+            "horsePower": 130
+        },
+        "features": [
+            "Climatisation bi-zone",
+            "GPS R-Link 2",
+            "Sièges cuir chauffants",
+            "Caméra de recul",
+            "Régulateur adaptatif",
+            "Coffre mains libres",
+            "Détection angles morts"
+        ],
+        "images": [],
+        "inventory": {
+            "location": "Rabat - Occasion Premium",
+            "daysInStock": 38
+        }
+    },
+    {
+        "id": "13",
+        "make": "Peugeot",
+        "model": "3008",
+        "year": 2023,
+        "mileage": 14000,
+        "condition": "Excellent",
+        "price": 295000,
+        "costPrice": 261000,
+        "status": "Disponible",
+        "specifications": {
+            "fuelType": "Hybride",
+            "transmission": "Automatique",
+            "color": "Bleu Magnetic",
+            "doors": 5,
+            "seats": 5,
+            "engineSize": "1.6L Hybrid4",
+            "horsePower": 225
+        },
+        "features": [
+            "Climatisation tri-zone",
+            "GPS 3D + NaviDrive",
+            "Caméra 360° HD",
+            "Sièges cuir massants",
+            "i-Cockpit Amplify",
+            "Toit panoramique",
+            "Mode 4x4 électrique",
+            "Aide au stationnement automatique"
+        ],
+        "images": [],
+        "inventory": {
+            "location": "Casablanca - Premium Showroom",
+            "daysInStock": 11
+        }
+    },
+    {
+        "id": "14",
+        "make": "Dacia",
+        "model": "Lodgy",
+        "year": 2021,
+        "mileage": 62000,
+        "condition": "Bon",
+        "price": 115000,
+        "costPrice": 101000,
+        "status": "Disponible",
+        "specifications": {
+            "fuelType": "Diesel",
+            "transmission": "Manuelle",
+            "color": "Gris Comète",
+            "doors": 5,
+            "seats": 7,
+            "engineSize": "1.5L dCi",
+            "horsePower": 90
+        },
+        "features": [
+            "Climatisation",
+            "Radio MP3",
+            "7 places",
+            "Direction assistée",
+            "Coffre modulable",
+            "ABS + ESP"
+        ],
+        "images": [],
+        "inventory": {
+            "location": "Agadir - Concession",
+            "daysInStock": 61
+        }
+    },
+    {
+        "id": "15",
+        "make": "Renault",
+        "model": "Megane",
+        "year": 2022,
+        "mileage": 28000,
+        "condition": "Très bon",
+        "price": 165000,
+        "costPrice": 146000,
+        "status": "Disponible",
+        "specifications": {
+            "fuelType": "Diesel",
+            "transmission": "Automatique",
+            "color": "Noir Étoilé",
+            "doors": 5,
+            "seats": 5,
+            "engineSize": "1.5L Blue dCi",
+            "horsePower": 115
+        },
+        "features": [
+            "Climatisation automatique",
+            "GPS EASY LINK",
+            "Caméra de recul",
+            "Régulateur adaptatif",
+            "Sièges chauffants",
+            "Détection angles morts",
+            "Coffre mains libres"
+        ],
+        "images": [],
+        "inventory": {
+            "location": "Casablanca - Occasion",
+            "daysInStock": 25
+        }
+    }
+]

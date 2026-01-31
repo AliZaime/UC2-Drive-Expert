@@ -7,6 +7,7 @@ import {
   MessageSquare, ChevronRight, Plus, Trash2, Loader2
 } from 'lucide-react';
 import { StartNegotiationModal } from '../components/modals/StartNegotiationModal';
+import { StartAINegotiationModal } from '../components/modals/StartAINegotiationModal';
 
 // ===========================
 // ClientSaved Component
@@ -15,20 +16,11 @@ export const ClientSaved = () => {
   const [savedVehicles, setSavedVehicles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedVehicleForNeg, setSelectedVehicleForNeg] = useState<any>(null);
+  const [selectedVehicleForAiNeg, setSelectedVehicleForAiNeg] = useState<any>(null);
   const fetchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     fetchSavedVehicles();
-
-    // Listen for storage changes from other tabs
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'saved_vehicles') {
-        if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
-        fetchTimeoutRef.current = setTimeout(() => {
-          fetchSavedVehicles();
-        }, 500);
-      }
-    };
 
     // Listen for custom events from Vehicles component (same tab)
     const handleVehicleSaveChanged = () => {
@@ -38,12 +30,13 @@ export const ClientSaved = () => {
       }, 500);
     };
 
-    window.addEventListener('storage', handleStorageChange);
     window.addEventListener('vehicleSaveChanged', handleVehicleSaveChanged);
+    // Also re-fetch on focus to catch updates from other tabs
+    window.addEventListener('focus', handleVehicleSaveChanged);
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('vehicleSaveChanged', handleVehicleSaveChanged);
+      window.removeEventListener('focus', handleVehicleSaveChanged);
       if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
     };
   }, []);
@@ -51,20 +44,13 @@ export const ClientSaved = () => {
   const fetchSavedVehicles = async () => {
     setLoading(true);
     try {
-      const savedIds = JSON.parse(localStorage.getItem('saved_vehicles') || '[]');
+      const response = await api.get<any>('/my/vehicles/saved');
+      const data = response.data.data?.vehicles || response.data.vehicles || [];
       
-      const response = await api.get<any>('/vehicles');
-      const allVehicles = response.data.data?.vehicles || response.data.vehicles || [];
-      
-      const saved = allVehicles
-        .filter((v: any) => {
-          const vehicleId = String(v._id || v.id);
-          return savedIds.some((savedId: any) => String(savedId) === vehicleId);
-        })
-        .map((v: any) => ({
+      const saved = data.map((v: any) => ({
           ...v,
           id: v._id || v.id,
-          brand: v.make || v.brand,
+          make: v.make || v.brand,
           model: v.model || 'Modèle inconnu',
           year: v.year || new Date().getFullYear(),
           price: v.price || 0,
@@ -81,12 +67,14 @@ export const ClientSaved = () => {
     }
   };
 
-  const removeSaved = (vehicleId: string) => {
-    const savedIds = JSON.parse(localStorage.getItem('saved_vehicles') || '[]');
-    const updated = savedIds.filter((id: any) => String(id) !== String(vehicleId));
-    localStorage.setItem('saved_vehicles', JSON.stringify(updated));
-    window.dispatchEvent(new Event('vehicleSaveChanged'));
-    fetchSavedVehicles();
+  const removeSaved = async (vehicleId: string) => {
+    try {
+        await api.post(`/my/vehicles/${vehicleId}/save`);
+        window.dispatchEvent(new Event('vehicleSaveChanged'));
+        fetchSavedVehicles();
+    } catch (err) {
+        console.error('Failed to remove saved vehicle', err);
+    }
   };
 
   return (
@@ -110,15 +98,15 @@ export const ClientSaved = () => {
           {savedVehicles.map((vehicle) => (
             <Card key={vehicle.id} className="group hover:border-emerald-500/20 transition-all overflow-hidden">
               <div className="aspect-video bg-zinc-900 overflow-hidden">
-                <img src={vehicle.image} alt={vehicle.model} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <img src={vehicle.image || (vehicle.images && vehicle.images[0])} alt={vehicle.model} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               </div>
               <div className="p-6 space-y-4">
                 <div>
-                  <h3 className="text-xl font-black text-white uppercase tracking-tight">{vehicle.brand} {vehicle.model}</h3>
+                  <h3 className="text-xl font-black text-white uppercase tracking-tight">{vehicle.make} {vehicle.model}</h3>
                   <p className="text-xs text-zinc-500 uppercase font-bold tracking-widest">{vehicle.year}</p>
                 </div>
                 <div className="flex items-center justify-between">
-                  <p className="text-2xl font-black text-emerald-500">{vehicle.price?.toLocaleString('fr-FR')} €</p>
+                  <p className="text-2xl font-black text-emerald-500">{vehicle.price?.toLocaleString('fr-FR')} MAD</p>
                 </div>
                 <div className="flex gap-2">
                   <Button 
@@ -126,7 +114,15 @@ export const ClientSaved = () => {
                     className="flex-1"
                     onClick={() => setSelectedVehicleForNeg(vehicle)}
                   >
-                    <MessageSquare size={16} /> Négocier
+                    <MessageSquare size={16} /> Contacter
+                  </Button>
+                   <Button 
+                    variant="primary" 
+                    className="bg-purple-600 hover:bg-purple-700 border-purple-600 text-white"
+                    onClick={() => setSelectedVehicleForAiNeg(vehicle)}
+                    title="Négocier avec l'IA"
+                  >
+                    <Zap size={16} fill="currentColor" />
                   </Button>
                   <Button 
                     variant="ghost" 
@@ -144,8 +140,21 @@ export const ClientSaved = () => {
 
       {selectedVehicleForNeg && (
         <StartNegotiationModal
-          vehicle={selectedVehicleForNeg}
+          isOpen={!!selectedVehicleForNeg}
           onClose={() => setSelectedVehicleForNeg(null)}
+          vehicleId={selectedVehicleForNeg.id}
+          vehicleName={`${selectedVehicleForNeg.make} ${selectedVehicleForNeg.model}`}
+          agencyId={selectedVehicleForNeg.agencyId || selectedVehicleForNeg.agency?.id}
+        />
+      )}
+      
+      {selectedVehicleForAiNeg && (
+        <StartAINegotiationModal
+          isOpen={!!selectedVehicleForAiNeg}
+          onClose={() => setSelectedVehicleForAiNeg(null)}
+          vehicleId={selectedVehicleForAiNeg.id}
+          vehicleName={`${selectedVehicleForAiNeg.make} ${selectedVehicleForAiNeg.model}`}
+          agencyId={selectedVehicleForAiNeg.agencyId || selectedVehicleForAiNeg.agency?.id}
         />
       )}
     </div>
@@ -170,7 +179,7 @@ export const ClientContracts = () => {
       const list = res.data?.data?.contracts || res.data?.contracts || [];
       const normalized = list.map((c: any) => ({
         id: c._id,
-        vehicleName: c.vehicle?.model ? `${c.vehicle.brand || c.vehicle.make} ${c.vehicle.model}` : 'Véhicule',
+        vehicleName: c.vehicle?.model ? `${c.vehicle.make || c.vehicle.brand} ${c.vehicle.model}` : 'Véhicule',
         agencyName: c.agency?.name,
         status: c.status,
         price: c.finalPrice || c.price,
@@ -238,7 +247,7 @@ export const ClientContracts = () => {
                       {contract.price && (
                         <div className="flex items-center gap-2">
                           <span className="text-zinc-500 text-[10px] uppercase font-bold tracking-widest">Prix:</span>
-                          <span className="text-emerald-500 font-black">{contract.price.toLocaleString('fr-FR')} €</span>
+                          <span className="text-emerald-500 font-black">{contract.price.toLocaleString('fr-FR')} MAD</span>
                         </div>
                       )}
                       {contract.signedAt && (
@@ -333,7 +342,7 @@ export const ClientAppointments = () => {
       const data = res.data?.data?.vehicles || res.data?.vehicles || [];
       const normalized = data.map((v: any) => ({
         id: v._id || v.id,
-        label: `${v.brand || v.make || ''} ${v.model || ''}`.trim(),
+        label: `${v.make || v.brand || ''} ${v.model || ''}`.trim(),
         agencyId: v.agency?._id || v.agency?.id || v.agencyId,
       }));
       setVehicles(normalized);

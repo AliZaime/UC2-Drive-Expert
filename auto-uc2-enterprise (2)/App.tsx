@@ -23,6 +23,7 @@ import { KioskManagement } from './pages/admin/KioskManagement';
 import { UserProfile } from './pages/admin/UserProfile';
 import { ClientSaved, ClientContracts, ClientAppointments } from './pages/ClientSpace';
 import { SalesPipeline, FleetService, SalesAnalytics } from './pages/UserSpace';
+import { MyTeam } from './pages/MyTeam';
 import { ClientActivity } from './pages/ClientActivity';
 import { ClientSegments } from './pages/ClientSegments';
 import { User, UserRole } from './types';
@@ -33,7 +34,7 @@ const AppContent: React.FC<{ user: User | null; onLogin: (u: User) => void; onLo
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Landing />} />
+        <Route path="/" element={<Landing user={user} />} />
         <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Auth onLogin={onLogin} />} />
 
         <Route
@@ -63,7 +64,7 @@ const AppContent: React.FC<{ user: User | null; onLogin: (u: User) => void; onLo
                   )}
 
                   {/* Routes spécifiques Agent/Commercial */}
-                  {user.role === UserRole.USER && (
+                  {(user.role === UserRole.USER || user.role === UserRole.MANAGER) && (
                     <>
                       <Route path="/vehicles/new" element={<Vehicles />} />
                       <Route path="/fleet/media" element={<Vehicles />} />
@@ -72,8 +73,13 @@ const AppContent: React.FC<{ user: User | null; onLogin: (u: User) => void; onLo
                       <Route path="/clients/segments" element={<ClientSegments />} />
                       <Route path="/deals/pending" element={<SalesPipeline />} />
                       <Route path="/deals/closed" element={<SalesPipeline />} />
+                      <Route path="/deals/closed" element={<SalesPipeline />} />
                       <Route path="/analytics" element={<SalesAnalytics />} />
                     </>
+                  )}
+                  
+                  {user.role === UserRole.MANAGER && (
+                    <Route path="/my-team" element={<MyTeam />} />
                   )}
 
                   {/* Routes Admin */}

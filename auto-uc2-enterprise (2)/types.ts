@@ -28,15 +28,43 @@ export interface User {
 
 export interface Vehicle {
   id: string;
-  brand: string;
+  vin?: string;
+  make: string; // Changed from brand to make to match sample data if needed, or map it. Sample has "make".
+  // Types.ts had "brand". I should check if frontend uses "brand" or "make". 
+  // Models/Vehicle.js has "make". Import script mapped from "make".
+  // I should align frontend to "make".
   model: string;
   year: number;
   price: number;
-  status: 'available' | 'sold' | 'reserved' | 'pending' | 'maintenance' | 'incoming';
+  costPrice?: number; // New
+  status: 'Available' | 'Sold' | 'Reserved' | 'Maintenance' | 'Incoming' | 'Disponible'; // Add French 'Disponible' from sample
+  condition?: string; // Relaxed to string
+  
   marketValue?: number;
-  image: string;
+  images: string[]; // Array of strings
+  image?: string; // Keep for backward compat if needed (mapped to images[0])
+  
   mileage: number;
-  fuelType: string;
+  fuelType?: string; // Optional root
+  transmission?: string; // Optional root
+  
+  specifications?: {
+    fuelType: string;
+    transmission: string;
+    color: string;
+    doors: number;
+    seats: number;
+    engineSize: string;
+    horsePower: number;
+  };
+  
+  inventory?: {
+    location: string;
+    daysInStock: number;
+  };
+  
+  features?: string[];
+
   agencyId: string;
   agency?: {
     id: string;

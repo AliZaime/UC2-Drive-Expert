@@ -14,9 +14,9 @@ export const MOCK_VEHICLES: Vehicle[] = [
 ];
 
 export const MOCK_AGENCIES: Agency[] = [
-  { id: "a1", name: "Auto-UC2 Paris Nord", location: "Paris, FR", revenue: "1.2M€", fleetCount: 145, managerId: "2", status: 'active' },
-  { id: "a2", name: "Auto-UC2 Lyon Est", location: "Lyon, FR", revenue: "850k€", fleetCount: 92, managerId: "4", status: 'active' },
-  { id: "a3", name: "Auto-UC2 Berlin Center", location: "Berlin, DE", revenue: "2.1M€", fleetCount: 210, managerId: "1", status: 'maintenance' }
+  { id: "a1", name: "Auto-UC2 Paris Nord", location: "Paris, FR", revenue: "1.2M MAD", fleetCount: 145, managerId: "2", status: 'active' },
+  { id: "a2", name: "Auto-UC2 Lyon Est", location: "Lyon, FR", revenue: "850k MAD", fleetCount: 92, managerId: "4", status: 'active' },
+  { id: "a3", name: "Auto-UC2 Berlin Center", location: "Berlin, DE", revenue: "2.1M MAD", fleetCount: 210, managerId: "1", status: 'maintenance' }
 ];
 
 export const MOCK_METRICS: SystemMetric[] = [

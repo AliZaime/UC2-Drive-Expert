@@ -40,6 +40,15 @@ const conversationSchema = new mongoose.Schema({
         type: String,
         enum: ['active', 'archived', 'closed'],
         default: 'active'
+    },
+    isAiNegotiation: {
+        type: Boolean,
+        default: false
+    },
+    negotiationStatus: {
+        type: String,
+        enum: ['pending', 'accepted', 'rejected', 'expired'],
+        default: 'pending'
     }
 }, {
     timestamps: true

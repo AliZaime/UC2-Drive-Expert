@@ -1,0 +1,125 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ai-negotiation-service"
+version = "1.0.0"
+description = "Multi-Agent AI System for Autonomous Vehicle Negotiation with Emotional Intelligence"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+    { name = "Capgemini Hackathon Team" }
+]
+keywords = ["ai", "negotiation", "agents", "llm", "groq", "fastapi"]
+
+dependencies = [
+    "fastapi>=0.109.0",
+    "uvicorn[standard]>=0.27.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+    "python-dotenv>=1.0.0",
+    "langchain>=0.1.0",
+    "langchain-groq>=0.0.1",
+    "langchain-core>=0.1.0",
+    "langgraph>=0.0.20",
+    "aiofiles>=23.2.0",
+    "structlog>=24.1.0",
+    "slowapi>=0.1.9",
+    "httpx>=0.26.0",
+]
+
+[project.optional-dependencies]
+redis = [
+    "redis>=5.0.0",
+]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "httpx>=0.26.0",
+    "mypy>=1.8.0",
+    "ruff>=0.2.0",
+]
+all = [
+    "ai-negotiation-service[redis,dev]",
+]
+
+[project.scripts]
+serve = "src.interfaces.fast_api.main:start_server"
+
+[project.urls]
+Homepage = "https://github.com/capgemini/ai-negotiation-service"
+Documentation = "https://github.com/capgemini/ai-negotiation-service#readme"
+
+# ============ Tool Configuration ============
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-v --tb=short"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "B",      # flake8-bugbear
+    "C4",     # flake8-comprehensions
+    "UP",     # pyupgrade
+    "ARG",    # flake8-unused-arguments
+    "SIM",    # flake8-simplify
+]
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "B008",   # do not perform function calls in argument defaults
+    "B905",   # zip without strict=
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+
+[tool.ruff.isort]
+known-first-party = ["src"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+exclude = ["venv", "__pycache__", "tests"]
+
+[[tool.mypy.overrides]]
+module = [
+    "langchain.*",
+    "langchain_groq.*",
+    "langgraph.*",
+    "groq.*",
+]
+ignore_missing_imports = true
+
+[tool.coverage.run]
+source = ["src"]
+branch = true
+omit = ["tests/*", "*/__pycache__/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]

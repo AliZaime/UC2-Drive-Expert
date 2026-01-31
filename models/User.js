@@ -71,6 +71,11 @@ const userSchema = new mongoose.Schema({
         conversationDataUsage: { type: Boolean, default: false }, // Utilisation des données de conversation (chat socket & négociation IA)
         updatedAt: Date
     },
+
+    savedVehicles: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Vehicle'
+    }],
     
     active: {
         type: Boolean,

@@ -151,3 +151,52 @@ const filterObj = (obj, ...allowedFields) => {
     });
     return newObj;
 };
+
+exports.getMySavedVehicles = catchAsync(async (req, res, next) => {
+    const user = await User.findById(req.user.id).populate({
+        path: 'savedVehicles',
+        populate: { path: 'agency' } // Populate agency in vehicle
+    });
+    
+    res.status(200).json({
+        status: 'success',
+        results: user.savedVehicles ? user.savedVehicles.length : 0,
+        data: { vehicles: user.savedVehicles || [] }
+    });
+});
+
+exports.toggleSavedVehicle = catchAsync(async (req, res, next) => {
+    const { vehicleId } = req.body;
+    
+    if (!vehicleId) {
+        return next(new AppError('Vehicle ID is required', 400));
+    }
+    
+    const user = await User.findById(req.user.id);
+    
+    // Check if already saved
+    // Ensure savedVehicles array is initialized
+    if (!user.savedVehicles) user.savedVehicles = [];
+    
+    const index = user.savedVehicles.indexOf(vehicleId);
+    let action = '';
+    
+    if (index > -1) {
+        // Remove
+        user.savedVehicles.splice(index, 1);
+        action = 'removed';
+    } else {
+        // Add
+        user.savedVehicles.push(vehicleId);
+        action = 'added';
+    }
+    
+    await user.save({ validateBeforeSave: false });
+    
+    res.status(200).json({
+        status: 'success',
+        action,
+        data: { savedVehicles: user.savedVehicles }
+    });
+});
+

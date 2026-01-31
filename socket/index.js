@@ -83,8 +83,12 @@ const initializeSocket = (server) => {
         /**
          * Send a message
          */
+        /**
+         * Send a message
+         */
         socket.on('send_message', async (data) => {
             try {
+                console.log(`📨 [Socket] send_message received from user ${socket.userId}:`, data);
                 const { conversationId, content } = data;
 
                 // Verify access
@@ -117,6 +121,10 @@ const initializeSocket = (server) => {
                 } else {
                     conversation.unreadCount.agent += 1;
                 }
+                
+                // Update last message metadata
+                conversation.lastMessage = content.substring(0, 50);
+                conversation.lastMessageAt = new Date();
                 await conversation.save();
 
                 // Emit to all users in the conversation
@@ -134,6 +142,131 @@ const initializeSocket = (server) => {
                         sender: message.sender.name
                     });
                 }
+
+                // --- AI INTEGRATION START ---
+                console.log(`🔍 [Socket] Checking AI for conversation ${conversationId}`);
+                console.log(`🔍 [Socket] Subject: ${conversation.subject}, Flag: ${conversation.isAiNegotiation}`);
+
+                // Check if this is an AI conversation (marked by [IA] in subject or isAiNegotiation flag)
+                const isAIConversation = conversation.subject?.startsWith('[IA]') || conversation.isAiNegotiation;
+
+                if (isAIConversation) {
+                    console.log(`🤖 [Socket] AI Conversation detected! Processing...`);
+                    
+                    // Lazy load dependencies
+                    const AIService = require('../services/AIService');
+                    const Vehicle = require('../models/Vehicle');
+                    
+                    // AI Bot User ID
+                    const mongoose = require('mongoose');
+                    const AI_BOT_ID = new mongoose.Types.ObjectId(process.env.AI_BOT_USER_ID || '697d62074715f889ac90dd94');
+
+                    // Fetch vehicle data from MongoDB
+                    let vehicleContext = null;
+                    if (conversation.vehicleId) {
+                        try {
+                            const vehicle = await Vehicle.findById(conversation.vehicleId);
+                            if (vehicle) {
+                                vehicleContext = {
+                                    id: vehicle._id.toString(),
+                                    make: vehicle.make,
+                                    model: vehicle.model,
+                                    year: vehicle.year,
+                                    price: vehicle.price,
+                                    mileage: vehicle.mileage,
+                                    condition: vehicle.condition,
+                                    features: vehicle.features || [],
+                                    specifications: vehicle.specifications || {}
+                                };
+                                console.log(`📊 [Socket] Vehicle data loaded:`, vehicleContext.make, vehicleContext.model);
+                            }
+                        } catch (err) {
+                            console.error('Error fetching vehicle data:', err);
+                        }
+                    }
+
+                    // Simulate typing
+                    socket.to(`conversation:${conversationId}`).emit('user_typing', {
+                        userId: 'AI_BOT',
+                        conversationId
+                    });
+
+                    // Fetch history for context (last 10 messages)
+                    const historyMessages = await Message.find({ conversation: conversationId })
+                        .sort({ createdAt: -1 })
+                        .limit(10)
+                        .populate('sender');
+                    
+                    const history = historyMessages.reverse().map(msg => ({
+                        speaker: msg.sender._id.toString() === conversation.client.toString() ? 'customer' : 'agent',
+                        message: msg.content
+                    }));
+                    
+                    console.log(`🤖 [Socket] Calling AIService.negotiate...`);
+                    // Call AI Service with vehicle context
+                    const aiResponse = await AIService.negotiate({
+                        sessionId: conversationId.toString(),
+                        customerMessage: content,
+                        history: history,
+                        vehicle_context: vehicleContext // Pass vehicle data to Python service
+                    });
+                    
+                    console.log(`🤖 [Socket] AI Response received:`, aiResponse ? 'OK' : 'NULL');
+
+                    // Emit Real-time Metrics
+                    if (aiResponse && aiResponse.emotional_analysis) {
+                        console.log(`🤖 [Socket] Emitting metrics...`);
+                        io.to(`conversation:${conversationId}`).emit('ai_metrics_update', {
+                            conversationId,
+                            metrics: {
+                                sentiment: aiResponse.emotional_analysis.sentiment_score, // -1 to 1
+                                emotion: aiResponse.emotional_analysis.primary_emotion,
+                                keyPoints: aiResponse.emotional_analysis.key_concerns || [],
+                                intent: aiResponse.intent_detected,
+                                analysis: aiResponse.agent_steps ? aiResponse.agent_steps.map(s => `> ${s.action}: ${s.reasoning || 'OK'}`) : []
+                            }
+                        });
+                    }
+
+                    // Create AI Reply Message with BOT user as sender
+                    if (aiResponse && aiResponse.agent_message) {
+                        console.log(`🤖 [Socket] Queuing AI reply...`);
+                        // Wait a bit to simulate "thinking" time naturalness
+                        setTimeout(async () => {
+                            const aiMessage = await Message.create({
+                                conversation: conversationId,
+                                sender: AI_BOT_ID, // Use AI Bot instead of conversation.agent
+                                content: aiResponse.agent_message
+                            });
+                            await aiMessage.populate('sender', 'name email');
+
+                            // Update conversation again
+                            conversation.lastMessage = aiResponse.agent_message.substring(0, 50);
+                            conversation.lastMessageAt = new Date();
+                            conversation.unreadCount.client += 1; // Unread for client
+                            await conversation.save();
+
+                            // Stop typing
+                            socket.to(`conversation:${conversationId}`).emit('user_stop_typing', {
+                                userId: 'AI_BOT',
+                                conversationId
+                            });
+
+                            // Emit AI message
+                            io.to(`conversation:${conversationId}`).emit('new_message', {
+                                message: aiMessage,
+                                conversationId
+                            });
+                            console.log(`🤖 [Socket] AI reply sent.`);
+
+                        }, 1500); // 1.5s delay
+                    } else {
+                        console.log(`⚠️ [Socket] No agent_message in AI response.`);
+                    }
+                } else {
+                    console.log(`ℹ️ [Socket] Not an AI conversation.`);
+                }
+                // --- AI INTEGRATION END ---
 
             } catch (error) {
                 console.error('Error sending message:', error);

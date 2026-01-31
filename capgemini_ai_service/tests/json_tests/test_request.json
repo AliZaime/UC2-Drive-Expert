@@ -1,0 +1,15 @@
+{
+  "session_id": "test-123",
+  "customer_id": "cust-001",
+  "customer_message": "Bonjour, je cherche une voiture familiale",
+  "vehicle_context": {
+    "vehicle_id": "v1",
+    "price": 250000,
+    "cost": 212500
+  },
+  "profile_context": {
+    "segment": "Family",
+    "price_sensitivity": "Medium",
+    "priorities": ["safety", "space"]
+  }
+}

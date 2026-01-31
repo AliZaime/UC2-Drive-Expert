@@ -1,0 +1,9 @@
+{
+  "session_id": "test-accept-flow",
+  "customer_message": "Ok parfait, je prends la voiture!",
+  "current_offer": {
+    "monthly": 5500,
+    "duration": 60,
+    "vehicle_price": 280000
+  }
+}

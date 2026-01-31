@@ -48,9 +48,9 @@ export const VehicleDetails = () => {
         const diff = mv - v.price;
         const isGoodDeal = diff > 0;
         
-        return `Le modèle ${v.brand} ${v.model} (${v.year}) présente une dynamique de marché ${isGoodDeal ? 'favorable' : 'stable'}. ` +
-               `Notre algorithme estime sa valorisation réelle à environ ${mv.toLocaleString()}€, ` +
-               `${isGoodDeal ? `ce qui représente une opportunité immédiate de +${diff.toLocaleString()}€.` : 'alignée avec les standards actuels.'} ` +
+        return `Le modèle ${v.make} ${v.model} (${v.year}) présente une dynamique de marché ${isGoodDeal ? 'favorable' : 'stable'}. ` +
+               `Notre algorithme estime sa valorisation réelle à environ ${mv.toLocaleString()} Dh, ` +
+               `${isGoodDeal ? `ce qui représente une opportunité immédiate de +${diff.toLocaleString()} Dh.` : 'alignée avec les standards actuels.'} ` +
                `La courbe de dépréciation est ${v.year > 2022 ? 'faible' : 'modérée'} sur ce segment ${v.fuelType}.`;
     };
 
@@ -62,7 +62,7 @@ export const VehicleDetails = () => {
                 setVehicle({
                      ...data,
                      id: data._id || data.id,
-                     brand: data.make || data.brand,
+                     make: data.make || data.brand,
                      image: data.images?.[0] || data.image || 'https://images.unsplash.com/photo-1503376780353-7e6692767b70',
                      images: data.images?.length ? data.images : [data.image || 'https://images.unsplash.com/photo-1503376780353-7e6692767b70']
                 });
@@ -93,8 +93,8 @@ export const VehicleDetails = () => {
                     </Button>
                     <div>
                         <div className="flex items-center gap-3">
-                            <h1 className="text-4xl font-black text-white tracking-tighter uppercase">{vehicle.brand} {vehicle.model}</h1>
-                            <Badge variant={vehicle.status === 'available' ? 'success' : 'warning'}>{vehicle.status}</Badge>
+                            <h1 className="text-4xl font-black text-white tracking-tighter uppercase">{vehicle.make} {vehicle.model}</h1>
+                            <Badge variant={(vehicle.status === 'Available' || vehicle.status === 'Disponible') ? 'success' : 'warning'}>{vehicle.status}</Badge>
                         </div>
                         <p className="text-zinc-500 font-bold uppercase tracking-widest text-[10px] mt-1 flex items-center gap-2">
                              VIN: {vehicle.id} • Ref: REF-{vehicle.year}
@@ -149,7 +149,7 @@ export const VehicleDetails = () => {
                         <div className="flex justify-between items-end border-b border-white/5 pb-6">
                             <div>
                                 <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Prix de vente</p>
-                                <p className="text-4xl font-black text-white tracking-tighter">{vehicle.price.toLocaleString()}€</p>
+                                <p className="text-4xl font-black text-white tracking-tighter">{vehicle.price.toLocaleString()} MAD</p>
                             </div>
                             <Badge variant="info">TVA Incluse</Badge>
                         </div>
@@ -171,9 +171,9 @@ export const VehicleDetails = () => {
                                 <p className="text-base font-bold text-white">{vehicle.fuelType}</p>
                             </div>
                             <div className="p-4 rounded-2xl bg-zinc-950 border border-white/5 space-y-1">
-                                <div className="text-zinc-500 mb-2 text-xs font-black">€</div>
+                                <div className="text-zinc-500 mb-2 text-xs font-black">MAD</div>
                                 <p className="text-[10px] text-zinc-500 uppercase tracking-widest">Val. Marché</p>
-                                <p className="text-base font-bold text-white">{(vehicle.marketValue || vehicle.price).toLocaleString()}€</p>
+                                <p className="text-base font-bold text-white">{(vehicle.marketValue || vehicle.price).toLocaleString()} MAD</p>
                             </div>
                         </div>
 

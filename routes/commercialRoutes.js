@@ -428,4 +428,34 @@ router.post('/negotiations/:id/messages', negotiationController.addMessage);
  */
 router.post('/negotiations/:id/offer', negotiationController.makeOffer);
 
+
+const managerController = require('../controllers/managerController');
+
+/**
+ * @swagger
+ * /my/team:
+ *   get:
+ *     summary: Get my agency's agents
+ *     tags: [Commercial]
+ *     responses:
+ *       200:
+ *         description: List of agents
+ *   post:
+ *     summary: Create new agent in my agency
+ *     tags: [Commercial]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, email, password]
+ *     responses:
+ *       201:
+ *         description: Agent created
+ */
+router.route('/my/team')
+    .get(authMiddleware.restrictTo('manager'), managerController.getMyAgents)
+    .post(authMiddleware.restrictTo('manager'), managerController.createAgent);
+
 module.exports = router;

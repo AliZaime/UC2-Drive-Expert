@@ -1,0 +1,11 @@
+{
+  "session_id": "test-123",
+  "customer_id": "cust-001",
+  "customer_message": "C'est trop cher pour moi, je ne peux pas dépasser 3000 MAD par mois",
+  "current_offer": {
+    "monthly": 3450,
+    "duration": 60,
+    "vehicle_id": "v1",
+    "vehicle_price": 250000
+  }
+}

@@ -1,47 +1,24 @@
 
-import React, { useState, Suspense, useEffect } from 'react';
+import React, { useState, Suspense } from 'react';
 import Spline from '@splinetool/react-spline';
 import { ShieldCheck, Lock, Mail, ChevronRight, Sparkles, User } from 'lucide-react';
-import { UserRole } from '../types';
-import { MOCK_USERS } from '../constants';
-import { cn } from '../components/UI';
 import { Link } from 'react-router-dom';
 
 import { api } from '../api';
 
 export const Auth = ({ onLogin }: { onLogin: (u: any) => void }) => {
   const [isRegister, setIsRegister] = useState(false);
-  const [loadingRole, setLoadingRole] = useState<UserRole | null>(null);
-  const [selectedRole, setSelectedRole] = useState<UserRole>(UserRole.USER);
+  const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  // Function to get credentials based on role
-  const getCredentialsForRole = (role: UserRole) => {
-    const user = MOCK_USERS.find(u => u.role === role);
-    if (user) {
-      return { email: user.email, password: 'password123' };
-    }
-    // Fallback for roles not in mock list
-    return { email: `${role}@autouc2.com`, password: 'password123' };
-  };
-
-  // Sync credentials when role changes (only in login mode)
-  useEffect(() => {
-    if (!isRegister) {
-      const creds = getCredentialsForRole(selectedRole);
-      setEmail(creds.email);
-      setPassword(creds.password);
-    }
-  }, [selectedRole, isRegister]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setLoadingRole(selectedRole);
+    setLoading(true);
 
     try {
       if (isRegister) {
@@ -63,7 +40,7 @@ export const Auth = ({ onLogin }: { onLogin: (u: any) => void }) => {
       console.error('Auth error:', err);
       setError(err.message || 'Échec de l\'opération');
     } finally {
-      setLoadingRole(null);
+      setLoading(false);
     }
   };
 
@@ -120,30 +97,8 @@ export const Auth = ({ onLogin }: { onLogin: (u: any) => void }) => {
 
         <div className="w-full max-w-md animate-in fade-in slide-in-from-right-8 duration-1000">
 
-          {/* ATTACHED Role Navigation Bubbles */}
-          {!isRegister && (
-            <div className="flex justify-center mb-[-1px]">
-              <div className="flex bg-zinc-900/60 backdrop-blur-xl border border-white/10 border-b-0 rounded-t-[2rem] p-1 gap-1">
-                {(Object.values(UserRole) as UserRole[]).map((role) => (
-                  <button
-                    key={role}
-                    onClick={() => setSelectedRole(role)}
-                    className={cn(
-                      "px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all",
-                      selectedRole === role
-                        ? "bg-[rgba(0,43,31,0.8)] text-white shadow-lg shadow-emerald-900/40"
-                        : "text-zinc-500 hover:text-white"
-                    )}
-                  >
-                    {isRegister ? 'S\'INSCRIRE' : role}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* Auth Card */}
-          <div className="bg-zinc-900/40 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] rounded-tl-none rounded-tr-none p-10 shadow-2xl relative overflow-hidden group">
+          <div className="bg-zinc-900/40 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-10 shadow-2xl relative overflow-hidden group">
             <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
 
             <div className="text-center mb-10">
@@ -153,7 +108,7 @@ export const Auth = ({ onLogin }: { onLogin: (u: any) => void }) => {
               </div>
               <h2 className="text-3xl font-black text-white tracking-tight">{isRegister ? 'Create Account' : 'Intelligence Portal'}</h2>
               <p className="text-zinc-500 text-sm mt-2 font-medium italic">
-                {isRegister ? 'Join the automotive revolution' : 'Authorized access for'} <span className="text-emerald-400 uppercase tracking-widest font-bold">{selectedRole}</span>
+                {isRegister ? 'Join the automotive revolution' : 'Please sign in to continue'}
               </p>
             </div>
 
@@ -216,10 +171,10 @@ export const Auth = ({ onLogin }: { onLogin: (u: any) => void }) => {
 
               <button
                 type="submit"
-                disabled={!!loadingRole}
+                disabled={!!loading}
                 className="w-full bg-[rgba(0,43,31,0.8)] hover:bg-[rgba(0,43,31,1)] text-white py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all shadow-xl shadow-emerald-900/20 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3 border border-emerald-500/20 group/btn"
               >
-                {loadingRole ? (
+                {loading ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
                   <>

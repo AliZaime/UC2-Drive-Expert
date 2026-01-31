@@ -23,11 +23,24 @@ export const CreateVehicleModal: React.FC<CreateVehicleModalProps> = ({ isOpen, 
     model: '',
     year: new Date().getFullYear().toString(),
     price: '',
+    costPrice: '',
     mileage: '',
-    fuelType: 'Petrol',
-    transmission: 'Automatic',
-    status: 'available',
-    agency: '659c23a7e4b0a1d4f8e5c321', // TODO: Get from user session/agency
+    
+    // Specs
+    fuelType: 'Essence', // French default
+    transmission: 'Manuelle', // French default
+    color: '',
+    doors: '5',
+    seats: '5',
+    engineSize: '',
+    horsePower: '',
+    
+    // Inventory
+    location: 'Casablanca - Showroom Principal',
+    daysInStock: '0',
+    
+    status: 'Disponible',
+    agency: '659c23a7e4b0a1d4f8e5c321', 
     description: ''
   });
 
@@ -49,10 +62,31 @@ export const CreateVehicleModal: React.FC<CreateVehicleModalProps> = ({ isOpen, 
     setError(null);
     try {
       const payload = {
-        ...formData,
+        vin: formData.vin,
+        make: formData.make,
+        model: formData.model,
         year: parseInt(formData.year),
         price: parseFloat(formData.price),
-        mileage: parseInt(formData.mileage) || 0
+        costPrice: parseFloat(formData.costPrice) || 0,
+        mileage: parseInt(formData.mileage) || 0,
+        
+        specifications: {
+            fuelType: formData.fuelType,
+            transmission: formData.transmission,
+            color: formData.color,
+            doors: parseInt(formData.doors),
+            seats: parseInt(formData.seats),
+            engineSize: formData.engineSize,
+            horsePower: parseInt(formData.horsePower) || 0
+        },
+        
+        inventory: {
+            location: formData.location,
+            daysInStock: parseInt(formData.daysInStock) || 0
+        },
+        
+        status: formData.status,
+        agency: formData.agency
       };
 
       const response = await api.post<any>('/vehicles', payload);
@@ -161,18 +195,30 @@ export const CreateVehicleModal: React.FC<CreateVehicleModalProps> = ({ isOpen, 
                 <Input name="year" type="number" label="Année" placeholder="2024" value={formData.year} onChange={handleChange} />
                 <Input name="mileage" type="number" label="Kilométrage" placeholder="0" value={formData.mileage} onChange={handleChange} />
                 
-                <div className="md:col-span-2">
-                    <Input name="price" type="number" label="Prix de vente (€)" placeholder="0.00" value={formData.price} onChange={handleChange} />
+                <div className="md:col-span-2 grid grid-cols-2 gap-4">
+                    <Input name="price" type="number" label="Prix de vente (MAD)" placeholder="0.00" value={formData.price} onChange={handleChange} />
+                    <Input name="costPrice" type="number" label="Coût d'achat (MAD)" placeholder="0.00" value={formData.costPrice} onChange={handleChange} />
+                </div>
+                
+                <h3 className="text-white font-bold md:col-span-2 mt-2">Spécifications</h3>
+                <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-4">
+                     <Input name="color" label="Couleur" placeholder="Ex: Noir" value={formData.color} onChange={handleChange} />
+                     <Input name="engineSize" label="Moteur" placeholder="Ex: 2.0L TDI" value={formData.engineSize} onChange={handleChange} />
+                     <Input name="horsePower" type="number" label="Chevaux (ch)" placeholder="150" value={formData.horsePower} onChange={handleChange} />
+                     <div className="grid grid-cols-2 gap-2">
+                        <Input name="doors" type="number" label="Portes" value={formData.doors} onChange={handleChange} />
+                        <Input name="seats" type="number" label="Sièges" value={formData.seats} onChange={handleChange} />
+                     </div>
                 </div>
 
                 <div className="md:col-span-2 space-y-2">
                     <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest block ml-1">Carburant</label>
                     <div className="flex gap-2">
                         {[
-                          { val: 'Petrol', label: 'Essence' },
+                          { val: 'Essence', label: 'Essence' },
                           { val: 'Diesel', label: 'Diesel' },
-                          { val: 'Hybrid', label: 'Hybride' },
-                          { val: 'Electric', label: 'Électrique' }
+                          { val: 'Hybride', label: 'Hybride' },
+                          { val: 'Électrique', label: 'Électrique' }
                         ].map(fuel => (
                             <button
                                 key={fuel.val}
@@ -189,8 +235,8 @@ export const CreateVehicleModal: React.FC<CreateVehicleModalProps> = ({ isOpen, 
                     <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest block ml-1">Boîte de Vitesse</label>
                     <div className="flex gap-2">
                         {[
-                          { val: 'Automatic', label: 'Automatique' },
-                          { val: 'Manual', label: 'Manuelle' }
+                          { val: 'Automatique', label: 'Automatique' },
+                          { val: 'Manuelle', label: 'Manuelle' }
                         ].map(trans => (
                             <button
                                 key={trans.val}
@@ -201,6 +247,12 @@ export const CreateVehicleModal: React.FC<CreateVehicleModalProps> = ({ isOpen, 
                             </button>
                         ))}
                     </div>
+                </div>
+                
+                <h3 className="text-white font-bold md:col-span-2 mt-2">Inventaire</h3>
+                <div className="md:col-span-2 grid grid-cols-2 gap-4">
+                     <Input name="location" label="Emplacement" placeholder="Ex: Showroom A" value={formData.location} onChange={handleChange} />
+                     <Input name="daysInStock" type="number" label="Jours en stock" value={formData.daysInStock} onChange={handleChange} />
                 </div>
             </div>
         ) : (

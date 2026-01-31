@@ -100,7 +100,7 @@ exports.getAgencyAvailableUsers = catchAsync(async (req, res, next) => {
     // Get all users in this agency (managers and staff only)
     const users = await User.find({ 
         agency: agencyId,
-        role: { $in: ['manager', 'user'] } // Only managers and staff
+        role: 'user' // Only staff/agents, exclude managers unless necessary
     }).select('_id name email role').sort('_id');
     
     if (!users || users.length === 0) {

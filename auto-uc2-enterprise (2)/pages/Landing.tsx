@@ -26,7 +26,9 @@ const FAQItem = ({ question, answer }: { question: string, answer: string }) => 
   );
 };
 
-export const Landing: React.FC = () => {
+import { User } from '../types';
+
+export const Landing: React.FC<{ user: User | null }> = ({ user }) => {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
 
   const scrollToSection = (id: string) => {
@@ -64,11 +66,20 @@ export const Landing: React.FC = () => {
           <button onClick={() => scrollToSection('impact')} className="hover:text-white transition-colors">About us</button>
         </div>
 
-        <Link to="/login">
-          <button className="bg-[rgba(0,43,31,0.8)] hover:bg-[rgba(0,43,31,1)] text-white px-8 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-[rgba(0,43,31,0.3)] border border-emerald-500/10">
-            Login
-          </button>
-        </Link>
+        {user ? (
+          <Link to="/dashboard">
+            <button className="bg-[rgba(0,43,31,0.8)] hover:bg-[rgba(0,43,31,1)] text-white px-8 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-[rgba(0,43,31,0.3)] border border-emerald-500/10 flex items-center gap-2">
+              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+              {user.name.split(' ')[0]}'s Space
+            </button>
+          </Link>
+        ) : (
+          <Link to="/login">
+            <button className="bg-[rgba(0,43,31,0.8)] hover:bg-[rgba(0,43,31,1)] text-white px-8 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-[rgba(0,43,31,0.3)] border border-emerald-500/10">
+              Login
+            </button>
+          </Link>
+        )}
       </nav>
 
       {/* Hero Section */}

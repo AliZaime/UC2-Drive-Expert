@@ -104,6 +104,9 @@ app.use('/api/v1/conversations', conversationRouter);
 const uploadRouter = require('./routes/upload');
 app.use('/api/v1/upload', uploadRouter);
 
+const aiRouter = require('./routes/aiRoutes');
+app.use('/api/v1/ai', aiRouter);
+
 
 
 // Note: User requirements listed "GET /dashboard/overview" not "GET /api/v1/dashboard/overview"

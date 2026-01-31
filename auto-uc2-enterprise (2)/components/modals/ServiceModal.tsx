@@ -46,10 +46,10 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({ isOpen, onClose, veh
       <div className="space-y-6">
           <div className="flex items-center gap-4 p-4 bg-zinc-900/50 rounded-2xl border border-white/5">
               <div className="w-16 h-12 rounded-lg bg-zinc-800 overflow-hidden">
-                  <img src={vehicle.image} className="w-full h-full object-cover" />
+                  <img src={vehicle.images?.[0] || vehicle.image} className="w-full h-full object-cover" />
               </div>
               <div>
-                  <h3 className="font-bold text-white text-sm">{vehicle.brand} {vehicle.model}</h3>
+                  <h3 className="font-bold text-white text-sm">{vehicle.make} {vehicle.model}</h3>
                   <p className="text-xs text-zinc-500">VIN: {vehicle.vin || vehicle.id}</p>
               </div>
           </div>

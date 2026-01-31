@@ -27,16 +27,16 @@ export const SalesPipeline = () => (
       </div>
       <div className="flex gap-4">
         <Badge variant="success">Objectif: 85%</Badge>
-        <Badge variant="info">Total: 1.2M€</Badge>
+        <Badge variant="info">Total: 1.2M Dh</Badge>
       </div>
     </div>
 
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
       {[
-        { label: 'Prospections', count: 42, value: '850k€', color: 'bg-zinc-800' },
-        { label: 'Négociations', count: 18, value: '420k€', color: 'bg-blue-500/20' },
-        { label: 'Financement', count: 8, value: '180k€', color: 'bg-amber-500/20' },
-        { label: 'Clôture', count: 12, value: '290k€', color: 'bg-emerald-500/20' },
+        { label: 'Prospections', count: 42, value: '850k Dh', color: 'bg-zinc-800' },
+        { label: 'Négociations', count: 18, value: '420k Dh', color: 'bg-blue-500/20' },
+        { label: 'Financement', count: 8, value: '180k Dh', color: 'bg-amber-500/20' },
+        { label: 'Clôture', count: 12, value: '290k Dh', color: 'bg-emerald-500/20' },
       ].map((step, i) => (
         <Card key={i} className="p-8 group hover:border-white/20 transition-all border-white/5">
            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4">{step.label}</p>
@@ -96,7 +96,7 @@ export const FleetService = () => {
          const normalized = maintenance.map((v: any) => ({
           ...v,
           id: v._id || v.id,
-          brand: v.make || v.brand,
+          make: v.make || v.brand,
         }));
         setVehicles(normalized);
       } catch (err) {
@@ -133,7 +133,7 @@ export const FleetService = () => {
                   <div className="flex items-center gap-6">
                      <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-600 group-hover:text-emerald-500 transition-colors"><Activity size={24}/></div>
                      <div>
-                        <h4 className="text-lg font-black text-white tracking-tight uppercase">{unit.brand} {unit.model}</h4>
+                        <h4 className="text-lg font-black text-white tracking-tight uppercase">{unit.make} {unit.model}</h4>
                         <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Maintenance en cours • ID: {unit.id.slice(-6)}</p>
                      </div>
                   </div>
@@ -187,7 +187,7 @@ export const SalesAnalytics = () => (
 
       <div className="space-y-8">
          {[
-           { label: 'Commission Estimée', value: '12,450€', trend: '+15%', up: true },
+           { label: 'Commission Estimée', value: '12,450 MAD', trend: '+15%', up: true },
            { label: 'Temps de Clôture', value: '14 Jours', trend: '-2 J', up: false },
            { label: 'Satisfaction Client', value: '4.9/5', trend: '+0.2', up: true },
          ].map((kpi, i) => (
